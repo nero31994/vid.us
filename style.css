@@ -191,6 +191,7 @@ body {
   margin-top: 15px;
 }
 
+/* Ensure close button is always visible */
 .close {
   position: absolute;
   top: 12px;
@@ -198,6 +199,7 @@ body {
   font-size: 28px;
   cursor: pointer;
   color: white;
+  z-index: 1001; /* Ensure close button stays above other elements */
 }
 
 .selector-group {
