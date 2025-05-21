@@ -147,7 +147,14 @@ body {
   margin: 20px;
   color: #aaa;
 }
+.modal-top {
+  transition: opacity 0.3s ease;
+}
 
+.modal-top.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
 .modal {
   position: fixed;
   top: 0;
