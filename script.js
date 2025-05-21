@@ -56,7 +56,7 @@ function displayMovies(items, clear = false) {
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
     `;
-    movieEl.onclick = () => openModal(item);
+    movieEl.onclick = () => openPlayer(movie);
     moviesDiv.appendChild(movieEl);
 
     // Observe image for lazy load
@@ -64,7 +64,7 @@ function displayMovies(items, clear = false) {
   });
 }
 
-async function openModal(item) {
+async function openPlayer(movie) {
   document.getElementById("modalTitle").innerText = item.title || item.name;
     showModal();
 
