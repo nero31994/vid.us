@@ -22,7 +22,8 @@ header {
   justify-content: center;
 }
 
-.controls input, .controls button {
+.controls input,
+.controls button {
   padding: 10px 14px;
   border: none;
   border-radius: 10px;
@@ -80,7 +81,8 @@ header {
   text-align: center;
 }
 
-#loading, #error {
+#loading,
+#error {
   text-align: center;
   margin: 20px;
   color: #aaa;
@@ -154,4 +156,47 @@ header {
 
 .selector-group select:hover {
   background: rgba(255,255,255,0.2);
+}
+
+/* LANDSCAPE MODE SUPPORT */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 20px;
+  }
+
+  .controls {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    padding: 10px 30px;
+  }
+
+  .modal-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .modal-content iframe {
+    width: 60%;
+    height: 400px;
+  }
+
+  #seasonEpisodes {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+    gap: 10px;
+  }
 }
