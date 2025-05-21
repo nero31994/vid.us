@@ -69,7 +69,7 @@ async function openModal(item) {
   document.getElementById("modalOverview").innerText = item.overview;
   document.getElementById("modalRelease").innerText = `Release: ${item.release_date || item.first_air_date || 'N/A'}`;
   document.getElementById("modalRating").innerText = `Rating: ${item.vote_average || 'N/A'}`;
-  document.getElementById("movieModal").style.display = "flex";
+  showModal();
 
   const iframe = document.getElementById("videoFrame");
   const selectorGroup = document.getElementById("seasonEpisodes");
@@ -192,3 +192,23 @@ window.onload = async () => {
   };
   await ensureFilled();
 };
+let hideTopTimeout;
+const modalTop = document.getElementById("modalTop");
+const movieModal = document.getElementById("movieModal");
+
+function resetTopTimer() {
+  clearTimeout(hideTopTimeout);
+  modalTop.classList.remove("hidden");
+  hideTopTimeout = setTimeout(() => {
+    modalTop.classList.add("hidden");
+  }, 3000);
+}
+
+movieModal.addEventListener("mousemove", resetTopTimer);
+movieModal.addEventListener("touchstart", resetTopTimer); // for mobile
+
+// Start hiding timer when modal is opened
+function showModal() {
+  document.getElementById("movieModal").style.display = "flex";
+  resetTopTimer();
+}
