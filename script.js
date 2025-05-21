@@ -19,7 +19,7 @@ async function fetchContent(query = '', page = 1) {
     ? (query ? `search/movie` : `movie/popular`) 
     : (query ? `search/tv` : `tv/popular`);
 
-  const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&query=${query}&page=${page}`;
+  const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
 
   try {
     const res = await fetch(url);
@@ -29,6 +29,7 @@ async function fetchContent(query = '', page = 1) {
     if (!data.results || data.results.length === 0) {
       if (page === 1) document.getElementById("movies").innerHTML = "";
       document.getElementById("error").innerText = "No results found!";
+      isFetching = false;
       return;
     }
 
@@ -36,8 +37,8 @@ async function fetchContent(query = '', page = 1) {
     displayMovies(data.results, page === 1);
   } catch (err) {
     document.getElementById("error").innerText = "Error fetching data!";
-    document.getElementById("loading").style.display = "none";
   } finally {
+    document.getElementById("loading").style.display = "none";
     isFetching = false;
   }
 }
@@ -103,7 +104,6 @@ async function openModal(item) {
       iframe.src = `${TV_PROXY}${item.id}/${seasonSelect.value}/${episodeSelect.value}`;
     });
 
-    // Trigger initial season load
     await loadEpisodes(item.id, seasonSelect.value, episodeSelect);
   }
 }
@@ -152,18 +152,22 @@ function switchMode(mode) {
 }
 
 window.addEventListener('scroll', () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 && !isFetching) {
     currentPage++;
     fetchContent(currentQuery, currentPage);
   }
 });
 
-fetchContent().then(() => {
-  const checkAndLoad = () => {
-    if (document.body.scrollHeight <= window.innerHeight) {
+window.onload = async () => {
+  await fetchContent(currentQuery, currentPage);
+
+  // Ensure enough content is loaded to fill the screen
+  const ensureFilled = async () => {
+    while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
-      fetchContent(currentQuery, currentPage).then(checkAndLoad);
+      await fetchContent(currentQuery, currentPage);
     }
   };
-  checkAndLoad();
-});
+
+  await ensureFilled();
+};
