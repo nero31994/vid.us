@@ -65,10 +65,7 @@ function displayMovies(items, clear = false) {
 }
 
 async function openModal(item) {
-  document.getElementById("modalTitle").innerText = item.title || item.name;
-  document.getElementById("modalOverview").innerText = item.overview;
-  document.getElementById("modalRelease").innerText = `Release: ${item.release_date || item.first_air_date || 'N/A'}`;
-  document.getElementById("modalRating").innerText = `Rating: ${item.vote_average || 'N/A'}`;
+  
   document.getElementById("movieModal").style.display = "flex";
 
   const iframe = document.getElementById("videoFrame");
