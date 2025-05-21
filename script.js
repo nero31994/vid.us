@@ -59,13 +59,15 @@ function displayMovies(items, clear = false) {
     movieEl.onclick = () => openModal(item);
     moviesDiv.appendChild(movieEl);
 
-    // Observe image for lazy load
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
 async function openModal(item) {
-  
+  document.getElementById("modalTitle").innerText = item.title || item.name;
+  document.getElementById("modalOverview").innerText = item.overview;
+  document.getElementById("modalRelease").innerText = `Release: ${item.release_date || item.first_air_date || 'N/A'}`;
+  document.getElementById("modalRating").innerText = `Rating: ${item.vote_average || 'N/A'}`;
   document.getElementById("movieModal").style.display = "flex";
 
   const iframe = document.getElementById("videoFrame");
@@ -151,7 +153,7 @@ function switchMode(mode) {
   fetchContent();
 }
 
-// Lazy image loader using IntersectionObserver
+// Lazy image loader
 const lazyObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -164,7 +166,7 @@ const lazyObserver = new IntersectionObserver((entries) => {
   rootMargin: "100px"
 });
 
-// Infinite scroll using IntersectionObserver
+// Infinite scroll
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
@@ -180,7 +182,6 @@ window.onload = async () => {
   const sentinel = document.getElementById("sentinel");
   sentinelObserver.observe(sentinel);
 
-  // Ensure content fills viewport
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
