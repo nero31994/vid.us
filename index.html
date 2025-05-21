@@ -32,12 +32,18 @@
     <div id="error"></div>
   </main>
 
-<!-- ✅ Modal for Movie Details -->
-<div id="movieModal" class="modal">
-  <span class="close" onclick="closeModal()">×</span>
-  <iframe id="videoFrame" allowfullscreen></iframe>
-  <div id="seasonEpisodes"></div>
-</div>
+  <!-- ✅ Modal for Movie Details -->
+  <div id="movieModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">×</span>
+      <h2 id="modalTitle"></h2>
+      <p id="modalOverview"></p>
+      <p id="modalRelease"></p>
+      <p id="modalRating"></p>
+      <div id="seasonEpisodes" class="selector-group"></div>
+      <iframe id="videoFrame" allowfullscreen></iframe>
+    </div>
+  </div>
 
   <!-- ✅ Auto-hide Intro After 3s with Fade Out -->
   <script>
