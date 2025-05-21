@@ -1,25 +1,23 @@
-</<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-      <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+  <meta name="viewport" content="width=device-width, initial-scale=0.5">
   <title>Movie & TV Explorer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-      <!-- ✅ Full-Screen Intro Screen -->
-    <div id="intro-screen" class="intro-screen">
-        <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation">
-    </div>
-    <div class="background-overlay"></div>
-
-    <!-- ✅ Sticky Header with Logo & Search -->
-    <header class="top-menu">
-        <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo">
-        
-    
+  <!-- ✅ Full-Screen Intro Screen -->
+  <div id="intro-screen" class="intro-screen">
+    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation">
+  </div>
   
+  <div class="background-overlay"></div>
+
+  <!-- ✅ Sticky Header with Logo & Search -->
+  <header class="top-menu">
+    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo">
+    
     <div class="controls">
       <button onclick="switchMode('movie')">Movies</button>
       <button onclick="switchMode('tv')">TV Series</button>
@@ -27,14 +25,15 @@
     </div>
   </header>
 
-  
-<div>
-  <div id="movies" class="movie-grid"></div>
-  <div id="sentinel"></div>
-  <div id="loading">Loading...</div>
-  <div id="error"></div>
-</div>
-  <!-- Modal -->
+  <!-- ✅ Movie Content Section -->
+  <main>
+    <div id="movies" class="movie-grid"></div>
+    <div id="sentinel"></div>
+    <div id="loading">Loading...</div>
+    <div id="error"></div>
+  </main>
+
+  <!-- ✅ Modal for Movie Details -->
   <div id="movieModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">×</span>
@@ -46,20 +45,21 @@
       <iframe id="videoFrame" allowfullscreen></iframe>
     </div>
   </div>
+
+  <!-- ✅ Auto-hide Intro After 3s with Fade Out -->
   <script>
-  window.addEventListener("load", function () {
-    const introScreen = document.querySelector(".intro-screen");
-    if (introScreen) {
-      setTimeout(function () {
-        introScreen.classList.add("fade-out");
-        // Wait for transition to end, then hide it
-        setTimeout(() => {
-          introScreen.classList.add("hidden");
-        }, 1000); // Match the fade-out duration (1s)
-      }, 3000); // Delay before fade-out starts (3s)
-    }
-  });
-</script>
+    window.addEventListener("load", function () {
+      const introScreen = document.querySelector(".intro-screen");
+      if (introScreen) {
+        setTimeout(function () {
+          introScreen.classList.add("fade-out");
+          setTimeout(() => {
+            introScreen.classList.add("hidden");
+          }, 1000); // Match the fade-out duration
+        }, 3000); // Show intro for 3 seconds
+      }
+    });
+  </script>
 
   <script src="script.js"></script>
 </body>
