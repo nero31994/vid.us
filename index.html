@@ -1,67 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.8">
-  <title>Movie & TV Explorer</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neroflix</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    #fullscreenPlayer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999;
+      display: none;
+    }
+
+    #fullscreenPlayer iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #exitFullscreen {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 30px;
+      color: white;
+      cursor: pointer;
+      z-index: 10000;
+    }
+  </style>
 </head>
 <body>
-  <!-- ✅ Full-Screen Intro Screen -->
-  <div id="intro-screen" class="intro-screen">
-    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation">
-  </div>
-  
-  
-  <!-- ✅ Sticky Header with Logo & Search -->
+
+  <!-- Header -->
   <header class="top-menu">
-    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo">
-    
-    <div class="controls">
-      <button onclick="switchMode('movie')">Movies</button>
-      <button onclick="switchMode('tv')">TV Series</button>
-      <input id="search" type="text" placeholder="Search..." oninput="debounceSearch()">
+    <img src="https://i.ibb.co/bMzZ1wYN/NEROFLIX-2-20-2025.png" alt="Logo" class="logo" />
+    <div class="search-container">
+      <input type="text" id="search" placeholder="Search movies or TV..." onkeyup="debounceSearch()" />
+    </div>
+    <div class="tabs">
+      <button onclick="switchMode('movie')" id="movieTab" class="active">Movies</button>
+      <button onclick="switchMode('tv')" id="tvTab">TV Series</button>
     </div>
   </header>
 
-  <!-- ✅ Movie Content Section -->
-  <main>
-    <div id="movies" class="movie-grid"></div>
-    <div id="sentinel"></div>
-    <div id="loading">Loading...</div>
-    <div id="error"></div>
-  </main>
+  <!-- Loading & Movie Grid -->
+  <p id="loading" class="loading">Loading...</p>
+  <div id="movies" class="grid"></div>
+  <p id="error" class="error"></p>
 
-  <!-- ✅ Modal for Movie Details -->
-  <div id="movieModal" class="modal">
-    <div class="modal-content">
-  <span class="close" onclick="closeModal()">&times;</span> <!-- Move here -->
-  <div class="modal-top" id="modalTop">
-    <h2 id="modalTitle"></h2>
-    <p id="modalOverview"></p>
-    <p id="modalRelease"></p>
-    <p id="modalRating"></p>
-    <div id="seasonEpisodes"></div>
+  <!-- Fullscreen Player -->
+  <div id="fullscreenPlayer">
+    <iframe id="fullscreenIframe" allowfullscreen></iframe>
+    <span id="exitFullscreen">&times;</span>
   </div>
-  <iframe id="videoFrame" allowfullscreen></iframe>
-</div>
-  </div>
-
-  <!-- ✅ Auto-hide Intro After 3s with Fade Out -->
-  <script>
-    window.addEventListener("load", function () {
-      const introScreen = document.querySelector(".intro-screen");
-      if (introScreen) {
-        setTimeout(function () {
-          introScreen.classList.add("fade-out");
-          setTimeout(() => {
-            introScreen.classList.add("hidden");
-          }, 1000); // Match the fade-out duration
-        }, 3000); // Show intro for 3 seconds
-      }
-    });
-  </script>
 
   <script src="script.js"></script>
+  <script>
+    // Open in fullscreen player
+    function openPlayer(movie) {
+      const iframe = document.getElementById('fullscreenIframe');
+      const mode = window.currentMode || 'movie';
+      iframe.src = mode === 'movie'
+        ? `https://vidora.su/embed/movie/${movie.id}`
+        : `https://vidora.su/embed/tv/${movie.id}`;
+      document.getElementById('fullscreenPlayer').style.display = 'block';
+    }
+
+    // Exit player
+    document.getElementById('exitFullscreen').addEventListener('click', () => {
+      document.getElementById('fullscreenPlayer').style.display = 'none';
+      document.getElementById('fullscreenIframe').src = '';
+    });
+  </script>
 </body>
 </html>
