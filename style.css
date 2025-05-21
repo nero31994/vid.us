@@ -147,7 +147,62 @@ body {
   margin: 20px;
   color: #aaa;
 }
+.modal-top {
+  transition: opacity 0.3s ease;
+}
 
+.modal-top.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-radius: 0; /* remove radius for full screen */
+  padding: 60px 20px 20px 20px; /* top padding for close button */
+  color: white;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content iframe {
+  width: 100%;
+  height: calc(100% - 140px); /* adjust height to fill remaining space */
+  border: none;
+  border-radius: 12px;
+  margin-top: 15px;
+}
+
+/* Close button always visible */
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+  color: white;
+  z-index: 1002;
+}
 
 .selector-group {
   display: flex;
@@ -173,52 +228,53 @@ body {
 .selector-group select:hover {
   background: rgba(255,255,255,0.2);
 }
-/* Fullscreen Player Styles */
-#fullscreenPlayer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 9999;
-  display: none;
-}
-
-#fullscreenPlayer iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-#exitFullscreen {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 30px;
-  color: white;
-  cursor: pointer;
-  z-index: 10000;
-}
-
-/* Landscape-specific adjustments */
-@media screen and (orientation: landscape) {
-  #fullscreenPlayer {
-    padding: 20px;
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 20px;
   }
 
-  #fullscreenPlayer iframe {
-    border-radius: 10px;
-  }
-}
-
-/* Portrait-specific adjustments */
-@media screen and (orientation: portrait) {
-  #fullscreenPlayer {
-    padding-top: 60px;
+  .controls {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
   }
 
-  #fullscreenPlayer iframe {
-    border-radius: 0;
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    padding: 10px 30px;
+  }
+
+  .modal {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 60px 20px 20px;
+    box-sizing: border-box;
+  }
+
+  .modal-content iframe {
+    width: 60%;
+    height: calc(100% - 100px); /* adjust height to fit screen */
+  }
+
+  #seasonEpisodes {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: calc(100% - 100px);
+    overflow-y: auto;
+    gap: 10px;
   }
 }
