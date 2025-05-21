@@ -228,8 +228,6 @@ body {
 .selector-group select:hover {
   background: rgba(255,255,255,0.2);
 }
-
-/* LANDSCAPE MODE SUPPORT */
 @media screen and (orientation: landscape) and (max-height: 500px) {
   header {
     flex-direction: row;
@@ -248,25 +246,34 @@ body {
     padding: 10px 30px;
   }
 
+  .modal {
+    align-items: center;
+    justify-content: center;
+  }
+
   .modal-content {
-    max-width: 90vw;
-    max-height: 90vh;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     display: flex;
     flex-direction: row;
     gap: 20px;
     align-items: flex-start;
+    padding: 60px 20px 20px;
+    box-sizing: border-box;
   }
 
   .modal-content iframe {
     width: 60%;
-    height: 400px;
+    height: calc(100% - 100px); /* adjust height to fit screen */
   }
 
   #seasonEpisodes {
     display: flex;
     flex-direction: column;
     flex: 1;
-    max-height: 400px;
+    height: calc(100% - 100px);
     overflow-y: auto;
     gap: 10px;
   }
