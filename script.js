@@ -15,8 +15,8 @@ async function fetchContent(query = '', page = 1) {
   isFetching = true;
   document.getElementById("loading").style.display = "block";
 
-  let endpoint = currentMode === 'movie' 
-    ? (query ? `search/movie` : `movie/popular`) 
+  let endpoint = currentMode === 'movie'
+    ? (query ? `search/movie` : `movie/popular`)
     : (query ? `search/tv` : `tv/popular`);
 
   const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
@@ -53,11 +53,14 @@ function displayMovies(items, clear = false) {
     const movieEl = document.createElement("div");
     movieEl.classList.add("movie");
     movieEl.innerHTML = `
-      <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy">
+      <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
     `;
     movieEl.onclick = () => openModal(item);
     moviesDiv.appendChild(movieEl);
+
+    // Observe image for lazy load
+    lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
@@ -151,23 +154,41 @@ function switchMode(mode) {
   fetchContent();
 }
 
-window.addEventListener('scroll', () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 && !isFetching) {
+// Lazy image loader using IntersectionObserver
+const lazyObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.src;
+      lazyObserver.unobserve(img);
+    }
+  });
+}, {
+  rootMargin: "100px"
+});
+
+// Infinite scroll using IntersectionObserver
+const sentinelObserver = new IntersectionObserver(async (entries) => {
+  if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
-    fetchContent(currentQuery, currentPage);
+    await fetchContent(currentQuery, currentPage);
   }
+}, {
+  rootMargin: "300px"
 });
 
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
 
-  // Ensure enough content is loaded to fill the screen
+  const sentinel = document.getElementById("sentinel");
+  sentinelObserver.observe(sentinel);
+
+  // Ensure content fills viewport
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
       await fetchContent(currentQuery, currentPage);
     }
   };
-
   await ensureFilled();
 };
