@@ -1,5 +1,5 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
-const IMG_URL = 'https://image.tmdb.org/t/p/w350';
+const IMG_URL = 'https://image.tmdb.org/t/p/w450';
 const MOVIE_PROXY = 'https://vidora.su/movie/';
 const TV_PROXY = 'https://vidora.su/tv/';
 
