@@ -46,6 +46,20 @@
       <iframe id="videoFrame" allowfullscreen></iframe>
     </div>
   </div>
+  <script>
+  window.addEventListener("load", function () {
+    const introScreen = document.querySelector(".intro-screen");
+    if (introScreen) {
+      setTimeout(function () {
+        introScreen.classList.add("fade-out");
+        // Wait for transition to end, then hide it
+        setTimeout(() => {
+          introScreen.classList.add("hidden");
+        }, 1000); // Match the fade-out duration (1s)
+      }, 3000); // Delay before fade-out starts (3s)
+    }
+  });
+</script>
 
   <script src="script.js"></script>
 </body>
