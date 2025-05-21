@@ -194,7 +194,7 @@ window.onload = async () => {
 };
 let hideTopTimeout;
 const modalTop = document.getElementById("modalTop");
-const movieModal = document.getElementById("movieModal");
+const modalContent = document.querySelector(".modal-content"); // To avoid hiding the close button
 
 function resetTopTimer() {
   clearTimeout(hideTopTimeout);
