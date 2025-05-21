@@ -1,17 +1,76 @@
+/* General Styles */
 body {
-  margin: 0;
-  background: #0f0f0f;
-  color: #fff;
-  font-family: 'Segoe UI', sans-serif;
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1em;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
+/* Intro Screen */
+.intro-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.intro-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Hide elements */
+.hidden {
+    display: none !important;
+}
+
+/* Background Overlay */
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("https://miro.medium.com/v2/resize:fit:1400/1*U4qm92ycN-TQ1_YIyUTblw.gif") center center / cover no-repeat;
+    filter: blur(8px);
+    z-index: -1;
+    background-attachment: fixed;
+}
+
+/* Sticky Header */
+.top-menu {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px;
+    z-index: 1000;
+}
+
+/* Logo */
+.logo {
+    height: 28px;
+}
+
+/* Search Bar */
+.search-container {
+    flex-grow: 1;
+    text-align: center;
 }
 
 .controls {
