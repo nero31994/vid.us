@@ -66,10 +66,7 @@ function displayMovies(items, clear = false) {
 
 async function openModal(item) {
   document.getElementById("modalTitle").innerText = item.title || item.name;
-  document.getElementById("modalOverview").innerText = item.overview;
-  document.getElementById("modalRelease").innerText = `Release: ${item.release_date || item.first_air_date || 'N/A'}`;
-  document.getElementById("modalRating").innerText = `Rating: ${item.vote_average || 'N/A'}`;
-  showModal();
+    showModal();
 
   const iframe = document.getElementById("videoFrame");
   const selectorGroup = document.getElementById("seasonEpisodes");
