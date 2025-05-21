@@ -1,5 +1,5 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+const IMG_URL = 'https://image.tmdb.org/t/p/w350';
 const MOVIE_PROXY = 'https://vidora.su/movie/';
 const TV_PROXY = 'https://vidora.su/tv/';
 
@@ -59,6 +59,7 @@ function displayMovies(items, clear = false) {
     movieEl.onclick = () => openModal(item);
     moviesDiv.appendChild(movieEl);
 
+    // Observe image for lazy load
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
@@ -153,7 +154,7 @@ function switchMode(mode) {
   fetchContent();
 }
 
-// Lazy image loader
+// Lazy image loader using IntersectionObserver
 const lazyObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -166,7 +167,7 @@ const lazyObserver = new IntersectionObserver((entries) => {
   rootMargin: "100px"
 });
 
-// Infinite scroll
+// Infinite scroll using IntersectionObserver
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
@@ -182,6 +183,7 @@ window.onload = async () => {
   const sentinel = document.getElementById("sentinel");
   sentinelObserver.observe(sentinel);
 
+  // Ensure content fills viewport
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
