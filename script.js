@@ -199,3 +199,22 @@ function showModal() {
   document.getElementById("movieModal").style.display = "flex";
   // modalTop stays hidden permanently
 }
+function showModal() {
+  const modal = document.getElementById("movieModal");
+  const video = document.getElementById("movieVideo");
+
+  modal.style.display = "flex";
+
+  if (video) {
+    video.play(); // Autoplay the video
+
+    // Request fullscreen if available
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) { // Safari
+      video.webkitRequestFullscreen();
+    } else if (video.msRequestFullscreen) { // IE11
+      video.msRequestFullscreen();
+    }
+  }
+}
