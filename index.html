@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Movie & TV Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movie & TV Explorer</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <!-- ✅ Full-Screen Intro Screen -->
@@ -12,14 +14,17 @@
     <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation">
   </div>
   
-  
   <!-- ✅ Sticky Header with Logo & Search -->
   <header class="top-menu">
     <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo">
     
     <div class="controls">
-      <button onclick="switchMode('movie')">Movies</button>
-      <button onclick="switchMode('tv')">TV Series</button>
+      <button onclick="switchMode('movie')" title="Movies">
+        <i class="fas fa-film"></i>
+      </button>
+      <button onclick="switchMode('tv')" title="TV Series">
+        <i class="fas fa-tv"></i>
+      </button>
       <input id="search" type="text" placeholder="Search..." oninput="debounceSearch()">
     </div>
   </header>
@@ -35,16 +40,16 @@
   <!-- ✅ Modal for Movie Details -->
   <div id="movieModal" class="modal">
     <div class="modal-content">
-  <span class="close" onclick="closeModal()">&times;</span> <!-- Move here -->
-  <div class="modal-top" id="modalTop">
-    <h2 id="modalTitle"></h2>
-    <p id="modalOverview"></p>
-    <p id="modalRelease"></p>
-    <p id="modalRating"></p>
-    <div id="seasonEpisodes"></div>
-  </div>
-  <iframe id="videoFrame" allowfullscreen></iframe>
-</div>
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="modal-top" id="modalTop">
+        <h2 id="modalTitle"></h2>
+        <p id="modalOverview"></p>
+        <p id="modalRelease"></p>
+        <p id="modalRating"></p>
+        <div id="seasonEpisodes"></div>
+      </div>
+      <iframe id="videoFrame" allowfullscreen></iframe>
+    </div>
   </div>
 
   <!-- ✅ Auto-hide Intro After 3s with Fade Out -->
@@ -56,33 +61,13 @@
           introScreen.classList.add("fade-out");
           setTimeout(() => {
             introScreen.classList.add("hidden");
-          }, 1000); // Match the fade-out duration
-        }, 3000); // Show intro for 3 seconds
+          }, 1000);
+        }, 3000);
       }
     });
   </script>
 
   <script src="script.js"></script>
-  <script>
-   function showModal() {
-  const modal = document.getElementById("movieModal");
-  const video = document.getElementById("movieVideo");
-
-  modal.style.display = "flex";
-
-  if (video) {
-    video.play(); // Autoplay the video
-
-    // Request fullscreen if available
-    if (video.requestFullscreen) {
-      video.requestFullscreen();
-    } else if (video.webkitRequestFullscreen) { // Safari
-      video.webkitRequestFullscreen();
-    } else if (video.msRequestFullscreen) { // IE11
-      video.msRequestFullscreen();
-    }
-  }
-}
-  </script>
+  
 </body>
 </html>
