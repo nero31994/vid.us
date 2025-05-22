@@ -189,23 +189,13 @@ window.onload = async () => {
   };
   await ensureFilled();
 };
-let hideTopTimeout;
 const modalTop = document.getElementById("modalTop");
-const modalContent = document.querySelector(".modal-content"); // To avoid hiding the close button
 
-function resetTopTimer() {
-  clearTimeout(hideTopTimeout);
-  modalTop.classList.remove("hidden");
-  hideTopTimeout = setTimeout(() => {
-    modalTop.classList.add("hidden");
-  }, 3000);
-}
+// Permanently hide the modalTop
+modalTop.classList.add("hidden");
 
-movieModal.addEventListener("mousemove", resetTopTimer);
-movieModal.addEventListener("touchstart", resetTopTimer); // for mobile
-
-// Start hiding timer when modal is opened
+// Show the modal without triggering any timer
 function showModal() {
   document.getElementById("movieModal").style.display = "flex";
-  resetTopTimer();
+  // modalTop stays hidden permanently
 }
