@@ -199,12 +199,3 @@ function showModal() {
   document.getElementById("movieModal").style.display = "flex";
   // modalTop stays hidden permanently
 }
-function openModal() {
-  document.getElementById("movieModal").style.display = "block";
-  document.getElementById("bottomNav").classList.add("hidden");
-}
-
-function closeModal() {
-  document.getElementById("movieModal").style.display = "none";
-  document.getElementById("bottomNav").classList.remove("hidden");
-}
