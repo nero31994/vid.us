@@ -14,7 +14,7 @@
     <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" />
   </div>
 
-  <!-- ✅ Sticky Header with Logo & Search -->
+  <!-- ✅ Sticky Header with Logo, Mode Switch, Search & Genre Filter -->
   <header class="top-menu">
     <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
 
@@ -39,6 +39,14 @@
           onblur="hideSearch()"
         />
       </div>
+    </div>
+
+    <!-- ✅ Genre Filter Dropdown -->
+    <div class="genre-filter">
+      <select id="genreFilter" title="Filter by Genre">
+        <option value="">All Genres</option>
+        <!-- JS will populate dynamically -->
+      </select>
     </div>
   </header>
 
@@ -91,7 +99,7 @@
         if (query.length > 0) {
           searchMovies(query);
         } else {
-          clearMovies(); // Optional
+          clearMovies();
         }
       }, 300);
     }
@@ -115,13 +123,11 @@
     }
 
     function switchMode(mode) {
-      // Your logic here
       console.log("Switched to:", mode);
     }
 
     function searchMovies(query) {
       console.log("Searching for:", query);
-      // Your live TMDB or FZMovies search logic
     }
 
     function clearMovies() {
@@ -129,7 +135,8 @@
     }
   </script>
 
+  <!-- ✅ External Scripts -->
   <script src="script.js"></script>
-    <script src="remote.js"></script>
+  <script src="remote.js"></script>
 </body>
 </html>
