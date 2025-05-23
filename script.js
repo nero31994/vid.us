@@ -10,6 +10,64 @@ let timeout = null;
 let currentMode = 'movie';
 let selectedTV = null;
 
+const ANIME_PROXY = 'https://player.vidsrc.co/embed/anime/';
+
+async function openModal(item) {
+  document.getElementById("modalTitle").innerText = item.title || item.name;
+  showModal();
+
+  const iframe = document.getElementById("videoFrame");
+  const selectorGroup = document.getElementById("seasonEpisodes");
+  selectorGroup.innerHTML = "";
+
+  if (currentMode === 'movie') {
+    iframe.src = `${MOVIE_PROXY}${item.id}`;
+  } else if (currentMode === 'tv') {
+    selectedTV = item;
+    const tvDetails = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
+    const tvData = await tvDetails.json();
+    if (!tvData.seasons || tvData.seasons.length === 0) return;
+
+    const seasonSelect = document.createElement("select");
+    seasonSelect.id = "seasonSelect";
+
+    tvData.seasons.forEach(season => {
+      const option = document.createElement("option");
+      option.value = season.season_number;
+      option.textContent = `Season ${season.season_number}`;
+      seasonSelect.appendChild(option);
+    });
+
+    const episodeSelect = document.createElement("select");
+    episodeSelect.id = "episodeSelect";
+
+    selectorGroup.appendChild(seasonSelect);
+    selectorGroup.appendChild(episodeSelect);
+
+    seasonSelect.addEventListener("change", () => {
+      loadEpisodes(item.id, seasonSelect.value, episodeSelect);
+    });
+
+    episodeSelect.addEventListener("change", () => {
+      iframe.src = `${TV_PROXY}${item.id}/${seasonSelect.value}/${episodeSelect.value}`;
+    });
+
+    seasonSelect.value = "1";
+    await loadEpisodes(item.id, "1", episodeSelect);
+    episodeSelect.value = "1";
+    iframe.src = `${TV_PROXY}${item.id}/1/1`;
+  } else if (currentMode === 'anime') {
+    // Crude anime movie check: usually anime movies have `title` but no `seasons`
+    const isAnimeMovie = item.media_type === 'movie' || item.title;
+
+    if (isAnimeMovie) {
+      iframe.src = `${MOVIE_PROXY}${item.id}`;
+    } else {
+      iframe.src = `${ANIME_PROXY}${item.id}/1/sub?autoPlay=false`;
+    }
+  }
+}
+
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
   isFetching = true;
