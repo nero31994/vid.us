@@ -290,3 +290,16 @@ body {
   width: 150px;
   opacity: 1;
 }
+.movie.focused {
+  outline: 3px solid #00ffff;
+  transform: scale(1.08);
+  z-index: 2;
+}
+.movie.focused {
+  outline: none;
+  position: relative;
+  z-index: 2;
+  transform: scale(1.1);
+  box-shadow: 0 0 12px 4px rgba(0, 255, 255, 0.7), 0 0 24px 8px rgba(0, 255, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
