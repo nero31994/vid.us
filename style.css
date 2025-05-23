@@ -315,3 +315,6 @@ body {
   font-size: 12px;
   margin-top: 2px;
 }
+main {
+  padding-bottom: 70px; /* To prevent content under bottom nav */
+}
