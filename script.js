@@ -204,3 +204,128 @@ function showModal() {
   document.getElementById("movieModal").style.display = "flex";
   // modalTop stays hidden permanently
 }
+const ANIME_PROXY = 'https://player.vidsrc.co/embed/anime/';
+
+async function openModal(item) {
+  document.getElementById("modalTitle").innerText = item.title || item.name;
+  showModal();
+
+  const iframe = document.getElementById("videoFrame");
+  const selectorGroup = document.getElementById("seasonEpisodes");
+  selectorGroup.innerHTML = "";
+
+  if (currentMode === 'movie') {
+    // Regular movie
+    iframe.src = `${MOVIE_PROXY}${item.id}`;
+  } 
+  else if (currentMode === 'tv') {
+    // Regular TV series
+    selectedTV = item;
+    const tvDetails = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
+    const tvData = await tvDetails.json();
+    if (!tvData.seasons || tvData.seasons.length === 0) return;
+
+    const seasonSelect = document.createElement("select");
+    seasonSelect.id = "seasonSelect";
+
+    tvData.seasons.forEach(season => {
+      const option = document.createElement("option");
+      option.value = season.season_number;
+      option.textContent = `Season ${season.season_number}`;
+      seasonSelect.appendChild(option);
+    });
+
+    const episodeSelect = document.createElement("select");
+    episodeSelect.id = "episodeSelect";
+
+    selectorGroup.appendChild(seasonSelect);
+    selectorGroup.appendChild(episodeSelect);
+
+    seasonSelect.addEventListener("change", () => {
+      loadEpisodes(item.id, seasonSelect.value, episodeSelect);
+    });
+
+    episodeSelect.addEventListener("change", () => {
+      iframe.src = `${TV_PROXY}${item.id}/${seasonSelect.value}/${episodeSelect.value}`;
+    });
+
+    seasonSelect.value = "1";
+    await loadEpisodes(item.id, "1", episodeSelect);
+    episodeSelect.value = "1";
+    iframe.src = `${TV_PROXY}${item.id}/1/1`;
+  }
+  else if (currentMode === 'anime') {
+    // Anime content: differentiate movie vs series by presence of 'episode_count'
+    // Fetch details from TMDB to check if it's movie or TV anime
+    let isMovie = false;
+    try {
+      // Try fetch movie details first
+      const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${item.id}?api_key=${API_KEY}`);
+      if (movieRes.ok) {
+        const movieData = await movieRes.json();
+        if (movieData && movieData.id) {
+          isMovie = true;
+        }
+      }
+    } catch {}
+
+    if (isMovie) {
+      // Anime Movie (use anime movie embed URL with id only)
+      iframe.src = `${ANIME_PROXY}${item.id}`;
+    } else {
+      // Anime TV Series
+      selectedTV = item;
+      const tvDetails = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
+      const tvData = await tvDetails.json();
+      if (!tvData.seasons || tvData.seasons.length === 0) return;
+
+      const seasonSelect = document.createElement("select");
+      seasonSelect.id = "seasonSelect";
+
+      tvData.seasons.forEach(season => {
+        const option = document.createElement("option");
+        option.value = season.season_number;
+        option.textContent = `Season ${season.season_number}`;
+        seasonSelect.appendChild(option);
+      });
+
+      const episodeSelect = document.createElement("select");
+      episodeSelect.id = "episodeSelect";
+
+      selectorGroup.appendChild(seasonSelect);
+      selectorGroup.appendChild(episodeSelect);
+
+      seasonSelect.addEventListener("change", () => {
+        loadAnimeEpisodes(item.id, seasonSelect.value, episodeSelect);
+      });
+
+      episodeSelect.addEventListener("change", () => {
+        iframe.src = `${ANIME_PROXY}${item.id}/${seasonSelect.value}/${episodeSelect.value}/sub?autoPlay=false`;
+      });
+
+      seasonSelect.value = "1";
+      await loadAnimeEpisodes(item.id, "1", episodeSelect);
+      episodeSelect.value = "1";
+      iframe.src = `${ANIME_PROXY}${item.id}/1/1/sub?autoPlay=false`;
+    }
+  }
+}
+
+async function loadAnimeEpisodes(tvId, seasonNumber, episodeSelect) {
+  episodeSelect.innerHTML = "";
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
+    const data = await res.json();
+    data.episodes.forEach(ep => {
+      const option = document.createElement("option");
+      option.value = ep.episode_number;
+      option.textContent = `Episode ${ep.episode_number}`;
+      episodeSelect.appendChild(option);
+    });
+
+    const iframe = document.getElementById("videoFrame");
+    iframe.src = `${ANIME_PROXY}${tvId}/${seasonNumber}/${data.episodes[0].episode_number}/sub?autoPlay=false`;
+  } catch (err) {
+    console.error("Failed to load anime episodes", err);
+  }
+}
