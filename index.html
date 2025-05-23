@@ -5,47 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Movie & TV Explorer</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <!-- ✅ Full-Screen Intro Screen -->
+  <!-- Intro Screen -->
   <div id="intro-screen" class="intro-screen">
     <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" />
   </div>
 
-  <!-- ✅ Sticky Header with Logo & Search -->
+  <!-- Header with Logo & Search -->
   <header class="top-menu">
-  <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
+    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
+    <div class="controls">
+      <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i></button>
+      <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i></button>
+      <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-magic"></i></button>
 
-  <div class="controls">
-    <button onclick="switchMode('movie')" title="Movies">
-      <i class="fas fa-film"></i>
-    </button>
-    <button onclick="switchMode('tv')" title="TV Series">
-      <i class="fas fa-tv"></i>
-    </button>
-    <button onclick="switchMode('anime')" title="Anime">
-      <i class="fas fa-magic"></i>
-    </button>
-
-    <div class="search-container">
-      <button class="search-toggle" onclick="toggleSearch()" title="Search">
-        <i class="fas fa-search"></i>
-      </button>
-      <input
-        id="search"
-        type="text"
-        class="search-input"
-        placeholder="Search..."
-        oninput="debounceSearch()"
-        onblur="hideSearch()"
-      />
+      <div class="search-container">
+        <button class="search-toggle" onclick="toggleSearch()" title="Search">
+          <i class="fas fa-search"></i>
+        </button>
+        <input
+          id="search"
+          type="text"
+          class="search-input"
+          placeholder="Search..."
+          oninput="debounceSearch()"
+          onblur="hideSearch()"
+        />
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-  <!-- ✅ Movie Content Section -->
+  <!-- Movie Content Section -->
   <main>
     <div id="movies" class="movie-grid"></div>
     <div id="sentinel"></div>
@@ -53,7 +45,7 @@
     <div id="error"></div>
   </main>
 
-  <!-- ✅ Modal for Movie Details -->
+  <!-- Modal for Movie Details -->
   <div id="movieModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
@@ -68,7 +60,7 @@
     </div>
   </div>
 
-  <!-- ✅ Intro Screen Fade Script -->
+  <!-- Intro Screen Script -->
   <script>
     window.addEventListener("load", function () {
       const introScreen = document.querySelector(".intro-screen");
@@ -83,136 +75,69 @@
     });
   </script>
 
-  <!-- ✅ Search Logic + UI Toggle -->
+  <!-- Mode & Search Logic -->
   <script>
-  let debounceTimeout;
-  let currentMode = 'movie'; // Default mode: 'movie' | 'tv' | 'anime'
+    let debounceTimeout;
+    let currentMode = 'movie';
 
-  function debounceSearch() {
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
+    function debounceSearch() {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        const query = document.getElementById("search").value.trim();
+        if (query.length > 0) {
+          searchMovies(query);
+        } else {
+          clearMovies();
+          loadInitialContent();
+        }
+      }, 300);
+    }
+
+    function toggleSearch() {
+      const container = document.querySelector('.search-container');
+      const input = document.getElementById('search');
+      container.classList.toggle('active');
+      if (container.classList.contains('active')) {
+        input.focus();
+      } else {
+        input.blur();
+      }
+    }
+
+    function hideSearch() {
+      const container = document.querySelector('.search-container');
+      setTimeout(() => {
+        container.classList.remove('active');
+      }, 200);
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      clearMovies();
       const query = document.getElementById("search").value.trim();
       if (query.length > 0) {
         searchMovies(query);
       } else {
-        clearMovies();
+        loadInitialContent();
       }
-    }, 300);
-  }
-
-  function toggleSearch() {
-    const container = document.querySelector('.search-container');
-    const input = document.getElementById('search');
-    container.classList.toggle('active');
-    if (container.classList.contains('active')) {
-      input.focus();
-    } else {
-      input.blur();
-    }
-  }
-
-  function hideSearch() {
-    const container = document.querySelector('.search-container');
-    setTimeout(() => {
-      container.classList.remove('active');
-    }, 200);
-  }
-
-  function switchMode(mode) {
-    currentMode = mode;
-    console.log("Switched to:", mode);
-
-    const query = document.getElementById("search").value.trim();
-    if (query.length > 0) {
-      searchMovies(query);
-    } else {
-      clearMovies();
     }
 
-    // Optional: UI indicator (e.g., highlighting selected button)
-    document.querySelectorAll("#modeSwitch button").forEach(btn => {
-      btn.classList.remove("active");
-    });
-    document.querySelector(`#modeSwitch button[data-mode="${mode}"]`)?.classList.add("active");
-  }
-
-  function searchMovies(query) {
-    console.log(`Searching for: ${query} [Mode: ${currentMode}]`);
-
-    const moviesContainer = document.getElementById("movies");
-    clearMovies();
-
-    const apiKey = '488eb36776275b8ae18600751059fb49';
-    const proxy = 'https://nerflixprox.arenaofvalorph937.workers.dev/proxy?id=';
-    let url;
-
-    if (currentMode === 'movie') {
-      url = `${proxy}https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${apiKey}`;
-    } else if (currentMode === 'tv') {
-      url = `${proxy}https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}&api_key=${apiKey}`;
-    } else if (currentMode === 'anime') {
-      // Anime embed search (optional improvement: fetch from your proxy or Jikan API)
-      const id = encodeURIComponent(query.toLowerCase().replace(/\s+/g, '-'));
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://vidsrc.cc/v2/embed/anime/${id}/1/sub?autoPlay=false`;
-      iframe.style.width = "100%";
-      iframe.style.height = "500px";
-      iframe.setAttribute("allowfullscreen", true);
-      moviesContainer.appendChild(iframe);
-      return;
+    function searchMovies(query) {
+      console.log(`Searching for "${query}" in mode "${currentMode}"`);
+      // Replace this with your actual fetch logic using currentMode and query
     }
 
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        if (!data.results || data.results.length === 0) {
-          moviesContainer.innerHTML = "<p>No results found.</p>";
-          return;
-        }
-
-        data.results.forEach(item => {
-          const title = item.title || item.name;
-          const poster = item.poster_path
-            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-            : 'fallback.jpg';
-          const id = item.id;
-
-          const card = document.createElement("div");
-          card.classList.add("movie-card");
-
-          card.innerHTML = `
-            <img src="${poster}" alt="${title}" />
-            <h3>${title}</h3>
-            <button onclick="playContent('${id}')">Play</button>
-          `;
-
-          moviesContainer.appendChild(card);
-        });
-      })
-      .catch(err => {
-        console.error("Error:", err);
-        moviesContainer.innerHTML = "<p>Error loading data.</p>";
-      });
-  }
-
-  function playContent(id) {
-    let embedURL;
-    if (currentMode === 'movie') {
-      embedURL = `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=false`;
-    } else if (currentMode === 'tv') {
-      embedURL = `https://vidsrc.cc/v2/embed/tv/${id}?autoPlay=false`;
+    function loadInitialContent() {
+      console.log(`Loading initial content for mode: ${currentMode}`);
+      // Replace this with your fetch for popular movies/TV/anime
     }
 
-    const moviesContainer = document.getElementById("movies");
-    moviesContainer.innerHTML = `<iframe src="${embedURL}" allowfullscreen style="width:100%; height:500px;"></iframe>`;
-  }
-
-  function clearMovies() {
-    document.getElementById("movies").innerHTML = "";
-  }
-</script>
+    function clearMovies() {
+      document.getElementById("movies").innerHTML = "";
+    }
+  </script>
 
   <script src="script.js"></script>
-    <script src="remote.js"></script>
+  <script src="remote.js"></script>
 </body>
 </html>
