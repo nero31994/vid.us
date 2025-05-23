@@ -59,21 +59,22 @@ function displayMovies(items, clear = false) {
     movieEl.onclick = () => openModal(item);
     moviesDiv.appendChild(movieEl);
 
-    // Observe image for lazy load
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
 async function openModal(item) {
   document.getElementById("modalTitle").innerText = item.title || item.name;
-    showModal();
+  showModal();
 
   const iframe = document.getElementById("videoFrame");
   const selectorGroup = document.getElementById("seasonEpisodes");
   selectorGroup.innerHTML = "";
+  selectorGroup.style.display = "block"; // Show selectors
 
   if (currentMode === 'movie') {
     iframe.src = `${MOVIE_PROXY}${item.id}`;
+    selectorGroup.style.display = "none"; // Hide if movie
   } else {
     selectedTV = item;
     const tvDetails = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
@@ -131,6 +132,7 @@ function closeModal() {
   document.getElementById("movieModal").style.display = "none";
   document.getElementById("videoFrame").src = "";
   document.getElementById("seasonEpisodes").innerHTML = "";
+  document.getElementById("seasonEpisodes").style.display = "none"; // Hide selectors
 }
 
 function debounceSearch() {
@@ -151,7 +153,6 @@ function switchMode(mode) {
   fetchContent();
 }
 
-// Lazy image loader using IntersectionObserver
 const lazyObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -164,7 +165,6 @@ const lazyObserver = new IntersectionObserver((entries) => {
   rootMargin: "100px"
 });
 
-// Infinite scroll using IntersectionObserver
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
@@ -180,7 +180,6 @@ window.onload = async () => {
   const sentinel = document.getElementById("sentinel");
   sentinelObserver.observe(sentinel);
 
-  // Ensure content fills viewport
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
@@ -189,13 +188,10 @@ window.onload = async () => {
   };
   await ensureFilled();
 };
-const modalTop = document.getElementById("modalTop");
 
-// Permanently hide the modalTop
+const modalTop = document.getElementById("modalTop");
 modalTop.classList.add("hidden");
 
-// Show the modal without triggering any timer
 function showModal() {
   document.getElementById("movieModal").style.display = "flex";
-  // modalTop stays hidden permanently
 }
