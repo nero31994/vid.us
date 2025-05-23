@@ -69,224 +69,215 @@ body {
 
 /* Search Bar */
 .search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
     flex-grow: 1;
-    text-align: center;
+    justify-content: center;
 }
 
+.search-toggle {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.search-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-input {
+    width: 0;
+    opacity: 0;
+    padding: 8px 10px;
+    margin-left: 5px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 14px;
+}
+
+.search-container.active .search-input {
+    width: 150px;
+    opacity: 1;
+}
+
+/* Controls */
 .controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .controls input,
 .controls button {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-size: 14px;
-  outline: none;
-  backdrop-filter: blur(5px);
-  transition: background 0.3s ease;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 14px;
+    outline: none;
+    backdrop-filter: blur(5px);
+    transition: background 0.3s ease;
 }
 
 .controls input::placeholder {
-  color: #ccc;
+    color: #ccc;
 }
 
 .controls input:hover,
 .controls button:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.movie-grid {
-  margin-top: 80px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px;
-  padding: 20px;
-}
-
-.movie {
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
-  border-radius: 12px;
-  transition: transform 0.3s ease;
-}
-
-.movie img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-}
-
-.movie:hover {
-  transform: scale(1.05);
-}
-
-.movie .overlay {
-  position: absolute;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-  width: 100%;
-  padding: 10px;
-  font-size: 13px;
-  color: white;
-  text-align: center;
-}
-
-#loading,
-#error {
-  text-align: center;
-  margin: 20px;
-  color: #aaa;
-}
-.modal-top {
-  transition: opacity 0.3s ease;
-}
-
-.modal-top.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.modal-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border-radius: 0;
-  padding: 40px 10px 10px 10px; /* smaller padding */
-  color: white;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.modal-content h2 {
-  margin: 0 0 8px;
-  flex-shrink: 0;
-}
-
-.modal-content iframe {
-  flex-grow: 1;
-  width: 100%;
-  border: none;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-/* Close button always visible */
-.close {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 28px;
-  cursor: pointer;
-  color: white;
-  z-index: 1002;
-}
-
-.selector-group {
-  display: flex;
-  gap: 10px;
-  margin: 15px 0;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-.selector-group select {
-  padding: 8px 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  font-size: 14px;
-  outline: none;
-  backdrop-filter: blur(10px);
-  transition: 0.3s ease;
-}
-
-.selector-group select:hover {
-  background: rgba(255,255,255,0.2);
-}
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    background: rgba(255,255,255,0.2);
 }
 
 .controls button {
-  background-color: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 50%;
-  padding: 10px;
-  cursor: pointer;
-  color: white;
-  font-size: 18px;
-  transition: background-color 0.3s ease;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
 }
 
-.controls button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+/* Movie Grid */
+.movie-grid {
+    margin-top: 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    padding: 20px;
 }
 
-.search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
+.movie {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
 }
 
-.search-toggle {
-  background-color: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 50%;
-  padding: 10px;
-  cursor: pointer;
-  font-size: 18px;
-  color: white;
-  transition: background-color 0.3s ease;
+.movie img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
 }
 
-.search-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+.movie:hover {
+    transform: scale(1.05);
 }
 
-.search-input {
-  width: 0;
-  opacity: 0;
-  padding: 8px 10px;
-  margin-left: 5px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  outline: none;
-  transition: width 0.3s ease, opacity 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 14px;
+.movie .overlay {
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+    color: white;
+    text-align: center;
 }
 
-.search-container.active .search-input {
-  width: 150px;
-  opacity: 1;
+/* Loading/Error */
+#loading,
+#error {
+    text-align: center;
+    margin: 20px;
+    color: #aaa;
+}
+
+/* Modal */
+.modal-top {
+    transition: opacity 0.3s ease;
+}
+
+.modal-top.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 0;
+    padding: 40px 10px 10px 10px;
+    color: white;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.modal-content h2 {
+    margin: 0 0 8px;
+    flex-shrink: 0;
+}
+
+.modal-content iframe {
+    flex-grow: 1;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: white;
+    z-index: 1002;
+}
+
+/* Selectors */
+.selector-group {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.selector-group select {
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    backdrop-filter: blur(10px);
+    transition: 0.3s ease;
+}
+
+.selector-group select:hover {
+    background: rgba(255,255,255,0.2);
 }
