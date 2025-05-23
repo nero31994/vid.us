@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Movie & TV Explorer</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-MIrC1uvxMyUwR3NUJgt3fpT8vPiQ8iRU+l1aLaKq/O/jm4UVO7GqQfEbDFHLuIDy/B48eGnMR4CFMJmHFs5j3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <!-- ✅ Full-Screen Intro Screen -->
   <div id="intro-screen" class="intro-screen">
-    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation">
+    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" />
   </div>
 
   <!-- ✅ Sticky Header with Logo & Search -->
   <header class="top-menu">
-    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo">
-    
+    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
+
     <div class="controls">
       <button onclick="switchMode('movie')" title="Movies">
         <i class="fas fa-film"></i>
@@ -24,10 +24,19 @@
       <button onclick="switchMode('tv')" title="TV Series">
         <i class="fas fa-tv"></i>
       </button>
-      
-      <div class="search-wrapper">
-        <i class="fas fa-search"></i>
-        <input id="search" type="text" placeholder="Search..." oninput="debounceSearch()">
+
+      <div class="search-container">
+        <button class="search-toggle" onclick="toggleSearch()" title="Search">
+          <i class="fas fa-search"></i>
+        </button>
+        <input
+          id="search"
+          type="text"
+          class="search-input"
+          placeholder="Search..."
+          oninput="debounceSearch()"
+          onblur="hideSearch()"
+        />
       </div>
     </div>
   </header>
@@ -55,7 +64,7 @@
     </div>
   </div>
 
-  <!-- ✅ Auto-hide Intro After 3s with Fade Out -->
+  <!-- ✅ Intro Screen Fade Script -->
   <script>
     window.addEventListener("load", function () {
       const introScreen = document.querySelector(".intro-screen");
@@ -70,25 +79,55 @@
     });
   </script>
 
-  <script src="script.js"></script>
+  <!-- ✅ Search Logic + UI Toggle -->
   <script>
-    function showModal() {
-      const modal = document.getElementById("movieModal");
-      const video = document.getElementById("movieVideo");
+    let debounceTimeout;
 
-      modal.style.display = "flex";
-
-      if (video) {
-        video.play();
-        if (video.requestFullscreen) {
-          video.requestFullscreen();
-        } else if (video.webkitRequestFullscreen) {
-          video.webkitRequestFullscreen();
-        } else if (video.msRequestFullscreen) {
-          video.msRequestFullscreen();
+    function debounceSearch() {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        const query = document.getElementById("search").value.trim();
+        if (query.length > 0) {
+          searchMovies(query);
+        } else {
+          clearMovies(); // Optional
         }
+      }, 300);
+    }
+
+    function toggleSearch() {
+      const container = document.querySelector('.search-container');
+      const input = document.getElementById('search');
+      container.classList.toggle('active');
+      if (container.classList.contains('active')) {
+        input.focus();
+      } else {
+        input.blur();
       }
     }
+
+    function hideSearch() {
+      const container = document.querySelector('.search-container');
+      setTimeout(() => {
+        container.classList.remove('active');
+      }, 200);
+    }
+
+    function switchMode(mode) {
+      // Your logic here
+      console.log("Switched to:", mode);
+    }
+
+    function searchMovies(query) {
+      console.log("Searching for:", query);
+      // Your live TMDB or FZMovies search logic
+    }
+
+    function clearMovies() {
+      document.getElementById("movies").innerHTML = "";
+    }
   </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
