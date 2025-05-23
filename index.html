@@ -5,21 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Movie & TV Explorer</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <!-- Intro Screen -->
+  <!-- ✅ Full-Screen Intro Screen -->
   <div id="intro-screen" class="intro-screen">
     <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" />
   </div>
 
-  <!-- Header with Logo & Search -->
+  <!-- ✅ Sticky Header with Logo & Search -->
   <header class="top-menu">
     <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
+
     <div class="controls">
-      <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i></button>
-      <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i></button>
-      <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-magic"></i></button>
+      <button onclick="switchMode('movie')" title="Movies">
+        <i class="fas fa-film"></i>
+      </button>
+      <button onclick="switchMode('tv')" title="TV Series">
+        <i class="fas fa-tv"></i>
+      </button>
 
       <div class="search-container">
         <button class="search-toggle" onclick="toggleSearch()" title="Search">
@@ -37,7 +42,7 @@
     </div>
   </header>
 
-  <!-- Movie Content Section -->
+  <!-- ✅ Movie Content Section -->
   <main>
     <div id="movies" class="movie-grid"></div>
     <div id="sentinel"></div>
@@ -45,7 +50,7 @@
     <div id="error"></div>
   </main>
 
-  <!-- Modal for Movie Details -->
+  <!-- ✅ Modal for Movie Details -->
   <div id="movieModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
@@ -60,7 +65,7 @@
     </div>
   </div>
 
-  <!-- Intro Screen Script -->
+  <!-- ✅ Intro Screen Fade Script -->
   <script>
     window.addEventListener("load", function () {
       const introScreen = document.querySelector(".intro-screen");
@@ -75,10 +80,9 @@
     });
   </script>
 
-  <!-- Mode & Search Logic -->
+  <!-- ✅ Search Logic + UI Toggle -->
   <script>
     let debounceTimeout;
-    let currentMode = 'movie';
 
     function debounceSearch() {
       clearTimeout(debounceTimeout);
@@ -87,8 +91,7 @@
         if (query.length > 0) {
           searchMovies(query);
         } else {
-          clearMovies();
-          loadInitialContent();
+          clearMovies(); // Optional
         }
       }, 300);
     }
@@ -112,24 +115,13 @@
     }
 
     function switchMode(mode) {
-      currentMode = mode;
-      clearMovies();
-      const query = document.getElementById("search").value.trim();
-      if (query.length > 0) {
-        searchMovies(query);
-      } else {
-        loadInitialContent();
-      }
+      // Your logic here
+      console.log("Switched to:", mode);
     }
 
     function searchMovies(query) {
-      console.log(`Searching for "${query}" in mode "${currentMode}"`);
-      // Replace this with your actual fetch logic using currentMode and query
-    }
-
-    function loadInitialContent() {
-      console.log(`Loading initial content for mode: ${currentMode}`);
-      // Replace this with your fetch for popular movies/TV/anime
+      console.log("Searching for:", query);
+      // Your live TMDB or FZMovies search logic
     }
 
     function clearMovies() {
@@ -138,6 +130,6 @@
   </script>
 
   <script src="script.js"></script>
-  <script src="remote.js"></script>
+    <script src="remote.js"></script>
 </body>
 </html>
