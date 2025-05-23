@@ -1,7 +1,7 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const MOVIE_PROXY = 'https://vidora.su/movie/';
-const TV_PROXY = 'https://vidora.su/tv/';
+const MOVIE_PROXY = 'https://player.vidsrc.co/embed/movie/';
+const TV_PROXY = 'https://player.vidsrc.co/embed/tv/';
 
 let currentPage = 1;
 let currentQuery = '';
