@@ -286,7 +286,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 40px;
   background: rgba(0, 0, 0, 0.9);
   display: flex;
   justify-content: space-around;
@@ -313,22 +313,5 @@ body {
 
 .bottom-nav span {
   font-size: 12px;
-  margin-top: 2px;
-}
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(20, 20, 20, 0.95);
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-  z-index: 1000;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.bottom-nav.hidden {
-  opacity: 0;
-  visibility: hidden;
+  margin-top: 4px;
 }
