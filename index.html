@@ -18,8 +18,14 @@
   <header class="top-menu">
     <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
 
-    
-      
+    <div class="controls">
+      <button onclick="switchMode('movie')" title="Movies">
+        <i class="fas fa-film"></i>
+      </button>
+      <button onclick="switchMode('tv')" title="TV Series">
+        <i class="fas fa-tv"></i>
+      </button>
+
       <div class="search-container">
         <button class="search-toggle" onclick="toggleSearch()" title="Search">
           <i class="fas fa-search"></i>
@@ -59,24 +65,6 @@
     </div>
   </div>
 
-
-  
-<!-- ✅ Sticky Bottom Navigation -->
-<nav class="bottom-nav">
-  <button onclick="switchMode('movie')" title="Movies">
-    <i class="fas fa-film"></i>
-    <span>Movies</span>
-  </button>
-  <button onclick="switchMode('tv')" title="TV Series">
-    <i class="fas fa-tv"></i>
-    <span>TV</span>
-  </button>
-  <button onclick="toggleSearch()" title="Search">
-    <i class="fas fa-search"></i>
-    <span>Search</span>
-  </button>
-</nav>
- 
   <!-- ✅ Intro Screen Fade Script -->
   <script>
     window.addEventListener("load", function () {
