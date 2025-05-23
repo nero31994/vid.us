@@ -281,3 +281,56 @@ body {
 .selector-group select:hover {
     background: rgba(255,255,255,0.2);
 }
+/* Base Navigation Styling */
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0.5rem 0;
+  z-index: 999;
+  transition: all 0.3s ease;
+}
+
+.app-nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.app-nav button span {
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+/* Landscape mode: transform to vertical sidebar */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .app-nav {
+    width: 60px;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    top: 0;
+    bottom: auto;
+    padding: 1rem 0;
+  }
+
+  .app-nav button {
+    margin: 1rem 0;
+  }
+
+  .app-nav button span {
+    display: none;
+  }
+}
