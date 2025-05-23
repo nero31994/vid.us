@@ -281,7 +281,7 @@ body {
 .selector-group select:hover {
     background: rgba(255,255,255,0.2);
 }
-.bottom-nav {
+.bottom-header {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -296,7 +296,7 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.bottom-nav button {
+.bottom-header button {
   background: none;
   border: none;
   color: white;
@@ -307,14 +307,16 @@ body {
   align-items: center;
 }
 
-.bottom-nav i {
+.bottom-header i {
   font-size: 18px;
 }
 
-.bottom-nav span {
+.bottom-header span {
   font-size: 12px;
   margin-top: 4px;
 }
+
+/* Add padding to main so content is not hidden behind bottom header */
 main {
-  padding-bottom: 80px; /* 60px nav height + 20px extra gap */
+  padding-bottom: 80px;
 }
