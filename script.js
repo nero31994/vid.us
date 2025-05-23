@@ -66,7 +66,7 @@ function displayMovies(items, clear = false) {
 
 async function openModal(item) {
   document.getElementById("modalTitle").innerText = item.title || item.name;
-    showModal();
+  showModal();
 
   const iframe = document.getElementById("videoFrame");
   const selectorGroup = document.getElementById("seasonEpisodes");
@@ -104,10 +104,13 @@ async function openModal(item) {
       iframe.src = `${TV_PROXY}${item.id}/${seasonSelect.value}/${episodeSelect.value}`;
     });
 
-    await loadEpisodes(item.id, seasonSelect.value, episodeSelect);
+    // Set default to Season 1 and load its episodes
+    seasonSelect.value = "1";
+    await loadEpisodes(item.id, "1", episodeSelect);
+    episodeSelect.value = "1";
+    iframe.src = `${TV_PROXY}${item.id}/1/1`;
   }
 }
-
 async function loadEpisodes(tvId, seasonNumber, episodeSelect) {
   episodeSelect.innerHTML = "";
   try {
