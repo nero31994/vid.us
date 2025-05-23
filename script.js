@@ -197,7 +197,7 @@ function resetTopTimer() {
   modalTop.classList.remove("hidden");
   hideTopTimeout = setTimeout(() => {
     modalTop.classList.add("hidden");
-  }, 3000);
+  }, 10000);
 }
 
 movieModal.addEventListener("mousemove", resetTopTimer);
