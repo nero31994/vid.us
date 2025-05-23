@@ -327,3 +327,45 @@ body {
 #seasonEpisodes select:hover {
   background: rgba(255,255,255,0.2);
 }
+/* Genre Filter Dropdown Styles */
+.genre-filter {
+  margin-left: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.genre-filter select {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  appearance: none;
+  padding: 6px 24px 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6H0z' fill='%23fff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 6px;
+}
+
+.genre-filter select option {
+  background-color: #222;
+  color: white;
+}
+@media (max-width: 600px) {
+  .genre-filter {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .genre-filter select {
+    width: 90%;
+  }
+}
