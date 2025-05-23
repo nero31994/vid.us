@@ -230,43 +230,63 @@ body {
 .selector-group select:hover {
   background: rgba(255,255,255,0.2);
 }
-.search-wrapper {
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.controls button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+}
+
+.controls button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-container {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.search-wrapper i {
-  position: absolute;
-  left: 10px;
-  color: #888;
-  font-size: 16px;
+.search-toggle {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  color: white;
+  transition: background-color 0.3s ease;
 }
 
-.search-wrapper input {
-  padding-left: 30px;
-  height: 36px;
-  border-radius: 6px;
-  border: none;
-  background: #1e1e1e;
+.search-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-input {
+  width: 0;
+  opacity: 0;
+  padding: 8px 10px;
+  margin-left: 5px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+  transition: width 0.3s ease, opacity 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 14px;
 }
 
-.search-wrapper input::placeholder {
-  color: #aaa;
-}
-
-.controls button {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 18px;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.controls button:hover {
-  color: #ff4444;
+.search-container.active .search-input {
+  width: 150px;
+  opacity: 1;
 }
