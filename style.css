@@ -281,66 +281,37 @@ body {
 .selector-group select:hover {
     background: rgba(255,255,255,0.2);
 }
-/* Fix body height and spacing */
-body {
-  margin: 0;
-  padding-bottom: 60px; /* space for bottom nav */
-}
-
-/* Bottom Navigation */
-.app-nav {
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
+  right: 0;
   height: 60px;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 1000;
-  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.app-nav button {
+.bottom-nav button {
   background: none;
   border: none;
   color: white;
-  font-size: 1.4rem;
+  text-align: center;
+  font-size: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  cursor: pointer;
 }
 
-.app-nav button span {
-  font-size: 0.75rem;
+.bottom-nav i {
+  font-size: 18px;
+}
+
+.bottom-nav span {
+  font-size: 12px;
   margin-top: 2px;
-}
-
-/* Landscape mode: left vertical sidebar */
-@media screen and (orientation: landscape) {
-  body {
-    padding-left: 60px;
-    padding-bottom: 0;
-  }
-
-  .app-nav {
-    width: 60px;
-    height: 100%;
-    bottom: auto;
-    top: 0;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 1rem;
-  }
-
-  .app-nav button {
-    margin: 1rem 0;
-  }
-
-  .app-nav button span {
-    display: none;
-  }
 }
