@@ -14,26 +14,27 @@ async function fetchContent(query = '', page = 1) {
   isFetching = true;
   document.getElementById("loading").style.display = "block";
 
-  const endpoint = currentMode === 'movie'
-    ? (query ? 'search/movie' : 'movie/popular')
-    : (query ? 'search/tv' : 'tv/popular');
+  let endpoint = currentMode === 'movie'
+    ? (query ? `search/movie` : `movie/popular`)
+    : (query ? `search/tv` : `tv/popular`);
 
   const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
 
   try {
     const res = await fetch(url);
     const data = await res.json();
+    document.getElementById("loading").style.display = "none";
 
-    document.getElementById("error").innerText = "";
-
-    if (!data.results?.length) {
+    if (!data.results || data.results.length === 0) {
       if (page === 1) document.getElementById("movies").innerHTML = "";
       document.getElementById("error").innerText = "No results found!";
+      isFetching = false;
       return;
     }
 
+    document.getElementById("error").innerText = "";
     displayMovies(data.results, page === 1);
-  } catch {
+  } catch (err) {
     document.getElementById("error").innerText = "Error fetching data!";
   } finally {
     document.getElementById("loading").style.display = "none";
@@ -48,37 +49,66 @@ function displayMovies(items, clear = false) {
   items.forEach(item => {
     if (!item.poster_path) return;
 
-    const el = document.createElement("div");
-    el.classList.add("movie");
-    el.innerHTML = `
+    const movieEl = document.createElement("div");
+    movieEl.classList.add("movie");
+    movieEl.innerHTML = `
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
+      <div class="preview-frame" style="display: none;">
+        <iframe src="" allow="autoplay" muted></iframe>
+      </div>
     `;
-    el.onclick = () => openIframe(item);
-    moviesDiv.appendChild(el);
 
-    lazyObserver.observe(el.querySelector('img'));
+    movieEl.onclick = () => openIframe(item);
+
+    movieEl.addEventListener('mouseenter', () => {
+      const iframe = movieEl.querySelector('iframe');
+      const previewDiv = movieEl.querySelector('.preview-frame');
+      const previewUrl = currentMode === 'movie'
+        ? `${MOVIE_PROXY}${item.id}`
+        : `${TV_PROXY}${item.id}/1/1`;
+      iframe.src = previewUrl;
+      previewDiv.style.display = 'block';
+    });
+
+    movieEl.addEventListener('mouseleave', () => {
+      const iframe = movieEl.querySelector('iframe');
+      const previewDiv = movieEl.querySelector('.preview-frame');
+      iframe.src = '';
+      previewDiv.style.display = 'none';
+    });
+
+    moviesDiv.appendChild(movieEl);
+    lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
 function openIframe(item) {
+  const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
-  iframe.src = currentMode === 'movie'
-    ? `${MOVIE_PROXY}${item.id}`
-    : `${TV_PROXY}${item.id}/1/1`;
 
-  document.getElementById("videoContainer").style.display = "block";
+  if (currentMode === 'movie') {
+    iframe.src = `${MOVIE_PROXY}${item.id}`;
+  } else {
+    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
+  }
+
+  container.style.display = "block";
 }
 
 function closeIframe() {
-  document.getElementById("videoFrame").src = "";
-  document.getElementById("videoContainer").style.display = "none";
+  const container = document.getElementById("videoContainer");
+  const iframe = document.getElementById("videoFrame");
+
+  iframe.src = "";
+  container.style.display = "none";
 }
 
 function debounceSearch() {
   clearTimeout(timeout);
   timeout = setTimeout(() => {
-    currentQuery = document.getElementById("search").value.trim();
+    const query = document.getElementById("search").value.trim();
+    currentQuery = query;
     currentPage = 1;
     fetchContent(currentQuery, currentPage);
   }, 300);
@@ -100,21 +130,30 @@ const lazyObserver = new IntersectionObserver((entries) => {
       lazyObserver.unobserve(img);
     }
   });
-}, { rootMargin: "100px" });
+}, {
+  rootMargin: "100px"
+});
 
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
     await fetchContent(currentQuery, currentPage);
   }
-}, { rootMargin: "300px" });
+}, {
+  rootMargin: "300px"
+});
 
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
-  sentinelObserver.observe(document.getElementById("sentinel"));
 
-  while (document.body.scrollHeight <= window.innerHeight + 100) {
-    currentPage++;
-    await fetchContent(currentQuery, currentPage);
-  }
+  const sentinel = document.getElementById("sentinel");
+  sentinelObserver.observe(sentinel);
+
+  const ensureFilled = async () => {
+    while (document.body.scrollHeight <= window.innerHeight + 100) {
+      currentPage++;
+      await fetchContent(currentQuery, currentPage);
+    }
+  };
+  await ensureFilled();
 };
