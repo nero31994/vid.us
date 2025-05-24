@@ -66,11 +66,13 @@ function openIframe(item) {
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
 
-  iframe.src = currentMode === 'movie'
-    ? `${MOVIE_PROXY}${item.id}`
-    : `${TV_PROXY}${item.id}/1/1`;
+  if (currentMode === 'movie') {
+    iframe.src = `${MOVIE_PROXY}${item.id}`;
+  } else {
+    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
+  }
 
-  container.classList.add('show');
+  container.style.display = "block";
 }
 
 function closeIframe() {
@@ -78,14 +80,7 @@ function closeIframe() {
   const iframe = document.getElementById("videoFrame");
 
   iframe.src = "";
-  container.classList.remove('show');
-
-  // Delay hiding container after transition
-  setTimeout(() => {
-    if (!container.classList.contains('show')) {
-      container.style.display = "none";
-    }
-  }, 400);
+  container.style.display = "none";
 }
 
 function debounceSearch() {
