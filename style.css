@@ -248,3 +248,24 @@ body {
 .selector-group select:hover {
     background: rgba(255,255,255,0.2);
 }
+.movie {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+.movie:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+.overlay {
+  position: absolute;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+  transition: background 0.3s ease;
+}
+.movie:hover .overlay {
+  background: rgba(0,0,0,0.8);
+}
