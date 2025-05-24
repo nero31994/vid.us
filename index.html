@@ -33,7 +33,7 @@
           id="search"
           type="text"
           class="search-input"
-          placeholder="Search..."
+          placeholder="Search for movies or TV shows..."
           oninput="debounceSearch()"
           onblur="hideSearch()"
         />
@@ -55,8 +55,9 @@
     <iframe id="videoFrame" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
   </div>
 
-  <!-- ✅ Intro Screen Fade Script -->
+  <!-- ✅ Scripts -->
   <script>
+    // Intro Screen Fade
     window.addEventListener("load", function () {
       const introScreen = document.querySelector(".intro-screen");
       if (introScreen) {
@@ -68,10 +69,21 @@
         }, 3000);
       }
     });
-  </script>
 
-  <!-- ✅ Search Logic + UI Toggle -->
-  <script>
+    // Responsive Placeholder
+    function updatePlaceholder() {
+      const searchInput = document.getElementById("search");
+      if (window.innerWidth < 500) {
+        searchInput.placeholder = "Search";
+      } else {
+        searchInput.placeholder = "Search for movies or TV shows...";
+      }
+    }
+
+    window.addEventListener("resize", updatePlaceholder);
+    window.addEventListener("DOMContentLoaded", updatePlaceholder);
+
+    // Search Logic + UI
     let debounceTimeout;
 
     function debounceSearch() {
@@ -81,7 +93,7 @@
         if (query.length > 0) {
           searchMovies(query);
         } else {
-          clearMovies(); // Optional
+          clearMovies();
         }
       }, 300);
     }
@@ -132,7 +144,6 @@
   </script>
 
   <script src="script.js"></script>
-  <script src="ex.js"></script>
   <script src="remote.js"></script>
 </body>
 </html>
