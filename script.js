@@ -14,27 +14,26 @@ async function fetchContent(query = '', page = 1) {
   isFetching = true;
   document.getElementById("loading").style.display = "block";
 
-  let endpoint = currentMode === 'movie'
-    ? (query ? `search/movie` : `movie/popular`)
-    : (query ? `search/tv` : `tv/popular`);
+  const endpoint = currentMode === 'movie'
+    ? (query ? 'search/movie' : 'movie/popular')
+    : (query ? 'search/tv' : 'tv/popular');
 
   const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
 
   try {
     const res = await fetch(url);
     const data = await res.json();
-    document.getElementById("loading").style.display = "none";
 
-    if (!data.results || data.results.length === 0) {
+    document.getElementById("error").innerText = "";
+
+    if (!data.results?.length) {
       if (page === 1) document.getElementById("movies").innerHTML = "";
       document.getElementById("error").innerText = "No results found!";
-      isFetching = false;
       return;
     }
 
-    document.getElementById("error").innerText = "";
     displayMovies(data.results, page === 1);
-  } catch (err) {
+  } catch {
     document.getElementById("error").innerText = "Error fetching data!";
   } finally {
     document.getElementById("loading").style.display = "none";
@@ -49,45 +48,37 @@ function displayMovies(items, clear = false) {
   items.forEach(item => {
     if (!item.poster_path) return;
 
-    const movieEl = document.createElement("div");
-    movieEl.classList.add("movie");
-    movieEl.innerHTML = `
+    const el = document.createElement("div");
+    el.classList.add("movie");
+    el.innerHTML = `
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
     `;
-    movieEl.onclick = () => openIframe(item);
-    moviesDiv.appendChild(movieEl);
+    el.onclick = () => openIframe(item);
+    moviesDiv.appendChild(el);
 
-    lazyObserver.observe(movieEl.querySelector('img'));
+    lazyObserver.observe(el.querySelector('img'));
   });
 }
 
 function openIframe(item) {
-  const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
+  iframe.src = currentMode === 'movie'
+    ? `${MOVIE_PROXY}${item.id}`
+    : `${TV_PROXY}${item.id}/1/1`;
 
-  if (currentMode === 'movie') {
-    iframe.src = `${MOVIE_PROXY}${item.id}`;
-  } else {
-    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
-  }
-
-  container.style.display = "block";
+  document.getElementById("videoContainer").style.display = "block";
 }
 
 function closeIframe() {
-  const container = document.getElementById("videoContainer");
-  const iframe = document.getElementById("videoFrame");
-
-  iframe.src = "";
-  container.style.display = "none";
+  document.getElementById("videoFrame").src = "";
+  document.getElementById("videoContainer").style.display = "none";
 }
 
 function debounceSearch() {
   clearTimeout(timeout);
   timeout = setTimeout(() => {
-    const query = document.getElementById("search").value.trim();
-    currentQuery = query;
+    currentQuery = document.getElementById("search").value.trim();
     currentPage = 1;
     fetchContent(currentQuery, currentPage);
   }, 300);
@@ -109,30 +100,21 @@ const lazyObserver = new IntersectionObserver((entries) => {
       lazyObserver.unobserve(img);
     }
   });
-}, {
-  rootMargin: "100px"
-});
+}, { rootMargin: "100px" });
 
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
     await fetchContent(currentQuery, currentPage);
   }
-}, {
-  rootMargin: "300px"
-});
+}, { rootMargin: "300px" });
 
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
+  sentinelObserver.observe(document.getElementById("sentinel"));
 
-  const sentinel = document.getElementById("sentinel");
-  sentinelObserver.observe(sentinel);
-
-  const ensureFilled = async () => {
-    while (document.body.scrollHeight <= window.innerHeight + 100) {
-      currentPage++;
-      await fetchContent(currentQuery, currentPage);
-    }
-  };
-  await ensureFilled();
+  while (document.body.scrollHeight <= window.innerHeight + 100) {
+    currentPage++;
+    await fetchContent(currentQuery, currentPage);
+  }
 };
