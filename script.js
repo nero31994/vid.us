@@ -55,29 +55,29 @@ function displayMovies(items, clear = false) {
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
     `;
-    movieEl.onclick = () => openFullscreen(item);
+    movieEl.onclick = () => openIframe(item);
     moviesDiv.appendChild(movieEl);
 
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
-function openFullscreen(item) {
+function openIframe(item) {
   const container = document.getElementById("videoContainer");
-  const iframe = document.getElementById("fullscreenPlayer");
+  const iframe = document.getElementById("videoFrame");
 
   if (currentMode === 'movie') {
     iframe.src = `${MOVIE_PROXY}${item.id}`;
   } else {
-    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default to Season 1, Episode 1
+    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
   }
 
   container.style.display = "block";
 }
 
-function closeFullscreen() {
+function closeIframe() {
   const container = document.getElementById("videoContainer");
-  const iframe = document.getElementById("fullscreenPlayer");
+  const iframe = document.getElementById("videoFrame");
 
   iframe.src = "";
   container.style.display = "none";
