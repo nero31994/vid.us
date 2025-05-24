@@ -9,6 +9,27 @@ body {
     overflow-x: hidden;
 }
 
+/* Animations */
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 /* Intro Screen */
 .intro-screen {
     position: fixed;
@@ -155,6 +176,7 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 15px;
     padding: 20px;
+    animation: fadeIn 0.6s ease forwards;
 }
 
 .movie {
@@ -163,7 +185,13 @@ body {
     overflow: hidden;
     border-radius: 12px;
     transition: transform 0.3s ease;
+    animation: fadeInScale 0.4s ease forwards;
 }
+
+.movie:nth-child(1) { animation-delay: 0.05s; }
+.movie:nth-child(2) { animation-delay: 0.1s; }
+.movie:nth-child(3) { animation-delay: 0.15s; }
+.movie:nth-child(4) { animation-delay: 0.2s; }
 
 .movie img {
     width: 100%;
@@ -193,67 +221,6 @@ body {
     text-align: center;
     margin: 20px;
     color: #aaa;
-}
-
-/* Modal */
-.modal-top {
-    transition: opacity 0.3s ease;
-}
-
-.modal-top.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border-radius: 0;
-    padding: 40px 10px 10px 10px;
-    color: white;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.modal-content h2 {
-    margin: 0 0 8px;
-    flex-shrink: 0;
-}
-
-.modal-content iframe {
-    flex-grow: 1;
-    width: 100%;
-    border: none;
-    border-radius: 10px;
-    margin-top: 10px;
-}
-
-.close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-    cursor: pointer;
-    color: white;
-    z-index: 1002;
 }
 
 /* Selectors */
