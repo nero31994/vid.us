@@ -269,3 +269,21 @@ body {
 .movie:hover .overlay {
   background: rgba(0,0,0,0.8);
 }
+#videoContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.4s ease;
+  opacity: 0;
+  z-index: 1000;
+}
+#videoContainer.show {
+  display: flex;
+  opacity: 1;
+}
