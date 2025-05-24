@@ -54,31 +54,10 @@ function displayMovies(items, clear = false) {
     movieEl.innerHTML = `
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
-      <div class="preview-frame" style="display: none;">
-        <iframe src="" allow="autoplay" muted></iframe>
-      </div>
     `;
-
     movieEl.onclick = () => openIframe(item);
-
-    movieEl.addEventListener('mouseenter', () => {
-      const iframe = movieEl.querySelector('iframe');
-      const previewDiv = movieEl.querySelector('.preview-frame');
-      const previewUrl = currentMode === 'movie'
-        ? `${MOVIE_PROXY}${item.id}`
-        : `${TV_PROXY}${item.id}/1/1`;
-      iframe.src = previewUrl;
-      previewDiv.style.display = 'block';
-    });
-
-    movieEl.addEventListener('mouseleave', () => {
-      const iframe = movieEl.querySelector('iframe');
-      const previewDiv = movieEl.querySelector('.preview-frame');
-      iframe.src = '';
-      previewDiv.style.display = 'none';
-    });
-
     moviesDiv.appendChild(movieEl);
+
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
