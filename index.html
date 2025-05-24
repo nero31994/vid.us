@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Movie & TV Explorer</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -50,19 +49,10 @@
     <div id="error"></div>
   </main>
 
-  <!-- ✅ Modal for Movie Details -->
-  <div id="movieModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <div class="modal-top" id="modalTop">
-        <h2 id="modalTitle"></h2>
-        <p id="modalOverview"></p>
-        <p id="modalRelease"></p>
-        <p id="modalRating"></p>
-        <div id="seasonEpisodes"></div>
-      </div>
-      <iframe id="videoFrame" allowfullscreen></iframe>
-    </div>
+  <!-- ✅ Full-Screen Video Player -->
+  <div id="videoContainer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; background:black;">
+    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;font-size:2rem;color:white;">&times;</button>
+    <iframe id="videoFrame" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
   </div>
 
   <!-- ✅ Intro Screen Fade Script -->
@@ -115,21 +105,33 @@
     }
 
     function switchMode(mode) {
-      // Your logic here
       console.log("Switched to:", mode);
     }
 
     function searchMovies(query) {
       console.log("Searching for:", query);
-      // Your live TMDB or FZMovies search logic
     }
 
     function clearMovies() {
       document.getElementById("movies").innerHTML = "";
     }
+
+    function openIframe(videoUrl) {
+      const videoContainer = document.getElementById("videoContainer");
+      const videoFrame = document.getElementById("videoFrame");
+      videoFrame.src = videoUrl;
+      videoContainer.style.display = "block";
+    }
+
+    function closeIframe() {
+      const videoContainer = document.getElementById("videoContainer");
+      const videoFrame = document.getElementById("videoFrame");
+      videoFrame.src = "";
+      videoContainer.style.display = "none";
+    }
   </script>
 
   <script src="script.js"></script>
-    <script src="remote.js"></script>
+  <script src="remote.js"></script>
 </body>
 </html>
