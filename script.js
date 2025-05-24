@@ -8,7 +8,6 @@ let currentQuery = '';
 let isFetching = false;
 let timeout = null;
 let currentMode = 'movie';
-let selectedTV = null;
 
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
@@ -56,84 +55,32 @@ function displayMovies(items, clear = false) {
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
     `;
-    movieEl.onclick = () => openModal(item);
+    movieEl.onclick = () => openFullscreen(item);
     moviesDiv.appendChild(movieEl);
 
-    // Observe image for lazy load
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
-async function openModal(item) {
-  document.getElementById("modalTitle").innerText = item.title || item.name;
-  showModal();
-
-  const iframe = document.getElementById("videoFrame");
-  const selectorGroup = document.getElementById("seasonEpisodes");
-  selectorGroup.innerHTML = "";
+function openFullscreen(item) {
+  const container = document.getElementById("videoContainer");
+  const iframe = document.getElementById("fullscreenPlayer");
 
   if (currentMode === 'movie') {
     iframe.src = `${MOVIE_PROXY}${item.id}`;
   } else {
-    selectedTV = item;
-    const tvDetails = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
-    const tvData = await tvDetails.json();
-    if (!tvData.seasons || tvData.seasons.length === 0) return;
-
-    const seasonSelect = document.createElement("select");
-    seasonSelect.id = "seasonSelect";
-
-    tvData.seasons.forEach(season => {
-      const option = document.createElement("option");
-      option.value = season.season_number;
-      option.textContent = `Season ${season.season_number}`;
-      seasonSelect.appendChild(option);
-    });
-
-    const episodeSelect = document.createElement("select");
-    episodeSelect.id = "episodeSelect";
-
-    selectorGroup.appendChild(seasonSelect);
-    selectorGroup.appendChild(episodeSelect);
-
-    seasonSelect.addEventListener("change", () => {
-      loadEpisodes(item.id, seasonSelect.value, episodeSelect);
-    });
-
-    episodeSelect.addEventListener("change", () => {
-      iframe.src = `${TV_PROXY}${item.id}/${seasonSelect.value}/${episodeSelect.value}`;
-    });
-
-    // Set default to Season 1 and load its episodes
-    seasonSelect.value = "1";
-    await loadEpisodes(item.id, "1", episodeSelect);
-    episodeSelect.value = "1";
-    iframe.src = `${TV_PROXY}${item.id}/1/1`;
+    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default to Season 1, Episode 1
   }
-}
-async function loadEpisodes(tvId, seasonNumber, episodeSelect) {
-  episodeSelect.innerHTML = "";
-  try {
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
-    const data = await res.json();
-    data.episodes.forEach(ep => {
-      const option = document.createElement("option");
-      option.value = ep.episode_number;
-      option.textContent = `Episode ${ep.episode_number}`;
-      episodeSelect.appendChild(option);
-    });
 
-    const iframe = document.getElementById("videoFrame");
-    iframe.src = `${TV_PROXY}${tvId}/${seasonNumber}/${data.episodes[0].episode_number}`;
-  } catch (err) {
-    console.error("Failed to load episodes", err);
-  }
+  container.style.display = "block";
 }
 
-function closeModal() {
-  document.getElementById("movieModal").style.display = "none";
-  document.getElementById("videoFrame").src = "";
-  document.getElementById("seasonEpisodes").innerHTML = "";
+function closeFullscreen() {
+  const container = document.getElementById("videoContainer");
+  const iframe = document.getElementById("fullscreenPlayer");
+
+  iframe.src = "";
+  container.style.display = "none";
 }
 
 function debounceSearch() {
@@ -154,7 +101,6 @@ function switchMode(mode) {
   fetchContent();
 }
 
-// Lazy image loader using IntersectionObserver
 const lazyObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -167,7 +113,6 @@ const lazyObserver = new IntersectionObserver((entries) => {
   rootMargin: "100px"
 });
 
-// Infinite scroll using IntersectionObserver
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
@@ -183,7 +128,6 @@ window.onload = async () => {
   const sentinel = document.getElementById("sentinel");
   sentinelObserver.observe(sentinel);
 
-  // Ensure content fills viewport
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
@@ -192,13 +136,3 @@ window.onload = async () => {
   };
   await ensureFilled();
 };
-const modalTop = document.getElementById("modalTop");
-
-// Permanently hide the modalTop
-modalTop.classList.add("hidden");
-
-// Show the modal without triggering any timer
-function showModal() {
-  document.getElementById("movieModal").style.display = "flex";
-  // modalTop stays hidden permanently
-}
