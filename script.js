@@ -1,13 +1,22 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const MOVIE_PROXY = 'https://autoembed.pro/embed/movie/';
-const TV_PROXY = 'https://autoembed.pro/embed/tv/';
+const SERVERS = {
+  movie: [
+    { name: 'AutoEmbed', url: 'https://autoembed.pro/embed/movie/' },
+    { name: 'VidSrc', url: 'https://vidsrc.to/embed/movie/' }
+  ],
+  tv: [
+    { name: 'AutoEmbed', url: 'https://autoembed.pro/embed/tv/' },
+    { name: 'VidSrc', url: 'https://vidsrc.to/embed/tv/' }
+  ]
+};
 
 let currentPage = 1;
 let currentQuery = '';
 let isFetching = false;
 let timeout = null;
 let currentMode = 'movie';
+let currentItem = null;
 
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
@@ -92,16 +101,36 @@ function displayMovies(items, clear = false) {
 }
 
 function openIframe(item) {
+  currentItem = item;
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
 
-  if (currentMode === 'movie' || currentMode === 'anime') {
-    iframe.src = `${MOVIE_PROXY}${item.id}`;
+  const serverButtons = SERVERS[currentMode === 'anime' ? 'movie' : currentMode].map((s, index) =>
+    `<button onclick="switchServer(${index})">${s.name}</button>`
+  ).join('');
+
+  if (!document.getElementById("serverSwitcher")) {
+    const switcher = document.createElement("div");
+    switcher.id = "serverSwitcher";
+    switcher.style.cssText = "position:absolute;bottom:10px;left:10px;z-index:1001;";
+    switcher.innerHTML = serverButtons;
+    container.appendChild(switcher);
   } else {
-    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
+    document.getElementById("serverSwitcher").innerHTML = serverButtons;
   }
 
+  switchServer(0);
   container.style.display = "block";
+}
+
+function switchServer(index) {
+  const iframe = document.getElementById("videoFrame");
+  const item = currentItem;
+  const mode = currentMode === 'anime' ? 'movie' : currentMode;
+  const server = SERVERS[mode][index];
+  iframe.src = mode === 'tv'
+    ? `${server.url}${item.id}/1/1`
+    : `${server.url}${item.id}`;
 }
 
 function closeIframe() {
