@@ -3,11 +3,11 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
     { name: 'AutoEmbed', url: 'https://autoembed.pro/embed/movie/' },
-    { name: 'VidSrc', url: 'https://vidsrc.to/embed/movie/' }
+    { name: 'VidSrc', url: 'https://vidora.su/embed/movie/' }
   ],
   tv: [
     { name: 'AutoEmbed', url: 'https://autoembed.pro/embed/tv/' },
-    { name: 'VidSrc', url: 'https://vidsrc.to/embed/tv/' }
+    { name: 'VidSrc', url: 'https://vidora.su/embed/tv/' }
   ]
 };
 
