@@ -52,9 +52,17 @@
     <div id="error"></div>
   </main>
 
-  <!-- ✅ Full-Screen Video Player -->
+  <!-- ✅ Full-Screen Video Player with Server Selection -->
   <div id="videoContainer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; background:black;">
     <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;font-size:2rem;color:white;">&times;</button>
+    
+    <!-- ✅ Server Selection Buttons -->
+    <div id="serverButtons" style="position:absolute;top:10px;left:10px;z-index:1001;">
+      <button onclick="setServer('autoembed')" style="margin: 0 5px;">Autoembed</button>
+      <button onclick="setServer('vidsrc')" style="margin: 0 5px;">VidSrc</button>
+      <button onclick="setServer('vidsrcpro')" style="margin: 0 5px;">VidSrc Pro</button>
+    </div>
+
     <iframe id="videoFrame" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
   </div>
 
@@ -129,13 +137,6 @@
 
     function clearMovies() {
       document.getElementById("movies").innerHTML = "";
-    }
-
-    function openIframe(videoUrl) {
-      const videoContainer = document.getElementById("videoContainer");
-      const videoFrame = document.getElementById("videoFrame");
-      videoFrame.src = videoUrl;
-      videoContainer.style.display = "block";
     }
 
     function closeIframe() {
