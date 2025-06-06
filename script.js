@@ -189,10 +189,6 @@ function switchServer(index) {
     shield.style.display = "none";
   }
 
-
-  iframe.src = mode === 'tv'
-    ? `${server.url}${item.id}/1/1`
-    : `${server.url}${item.id}`;
 }
 
 function closeIframe() {
