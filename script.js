@@ -99,27 +99,51 @@ function displayMovies(items, clear = false) {
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
-
 function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
 
-  const serverButtons = SERVERS[currentMode === 'anime' ? 'movie' : currentMode].map((s, index) =>
-    `<button onclick="switchServer(${index})">${s.name}</button>`
-  ).join('');
+  const serverList = SERVERS[currentMode === 'anime' ? 'movie' : currentMode];
 
-  if (!document.getElementById("serverSwitcher")) {
-    const switcher = document.createElement("div");
-    switcher.id = "serverSwitcher";
-    switcher.style.cssText = "position:absolute;bottom:10px;left:10px;z-index:1001;";
-    switcher.innerHTML = serverButtons;
-    container.appendChild(switcher);
-  } else {
-    document.getElementById("serverSwitcher").innerHTML = serverButtons;
+  let serverSwitcher = document.getElementById("serverSwitcher");
+  if (!serverSwitcher) {
+    serverSwitcher = document.createElement("div");
+    serverSwitcher.id = "serverSwitcher";
+    serverSwitcher.style.cssText = `
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+    `;
+
+    const select = document.createElement("select");
+    select.id = "serverSelect";
+    select.style.cssText = `
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #000;
+      color: #fff;
+    `;
+    select.onchange = () => switchServer(select.selectedIndex);
+
+    serverList.forEach((s, i) => {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = s.name;
+      select.appendChild(option);
+    });
+
+    serverSwitcher.appendChild(select);
+    container.appendChild(serverSwitcher);
   }
 
+  // Set iframe to default server (index 0)
   switchServer(0);
+  document.getElementById("serverSelect").selectedIndex = 0;
   container.style.display = "block";
 }
 
