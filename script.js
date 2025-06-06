@@ -42,35 +42,6 @@ async function fetchContent(query = '', page = 1) {
   }
 }
 
-async function fetchAnime(page = 1) {
-  if (isFetching) return;
-  isFetching = true;
-  document.getElementById("loading").style.display = "block";
-
-  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16&with_original_language=ja&page=${page}&sort_by=popularity.desc`;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    document.getElementById("loading").style.display = "none";
-
-    if (!data.results || data.results.length === 0) {
-      if (page === 1) document.getElementById("movies").innerHTML = "";
-      document.getElementById("error").innerText = "No anime found!";
-      isFetching = false;
-      return;
-    }
-
-    document.getElementById("error").innerText = "";
-    displayMovies(data.results, page === 1);
-  } catch (err) {
-    document.getElementById("error").innerText = "Error fetching anime!";
-  } finally {
-    document.getElementById("loading").style.display = "none";
-    isFetching = false;
-  }
-}
-
 function displayMovies(items, clear = false) {
   const moviesDiv = document.getElementById("movies");
   if (clear) moviesDiv.innerHTML = "";
@@ -95,7 +66,7 @@ function openIframe(item) {
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
 
-  if (currentMode === 'movie' || currentMode === 'anime') {
+  if (currentMode === 'movie') {
     iframe.src = `${MOVIE_PROXY}${item.id}`;
   } else {
     iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
@@ -118,12 +89,7 @@ function debounceSearch() {
     const query = document.getElementById("search").value.trim();
     currentQuery = query;
     currentPage = 1;
-
-    if (currentMode === 'anime') {
-      fetchAnime(currentPage);
-    } else {
-      fetchContent(currentQuery, currentPage);
-    }
+    fetchContent(currentQuery, currentPage);
   }, 300);
 }
 
@@ -132,12 +98,7 @@ function switchMode(mode) {
   currentQuery = '';
   currentPage = 1;
   document.getElementById("search").value = '';
-
-  if (mode === 'anime') {
-    fetchAnime();
-  } else {
-    fetchContent();
-  }
+  fetchContent();
 }
 
 const lazyObserver = new IntersectionObserver((entries) => {
@@ -155,11 +116,7 @@ const lazyObserver = new IntersectionObserver((entries) => {
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
-    if (currentMode === 'anime') {
-      await fetchAnime(currentPage);
-    } else {
-      await fetchContent(currentQuery, currentPage);
-    }
+    await fetchContent(currentQuery, currentPage);
   }
 }, {
   rootMargin: "300px"
@@ -174,11 +131,7 @@ window.onload = async () => {
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
       currentPage++;
-      if (currentMode === 'anime') {
-        await fetchAnime(currentPage);
-      } else {
-        await fetchContent(currentQuery, currentPage);
-      }
+      await fetchContent(currentQuery, currentPage);
     }
   };
   await ensureFilled();
