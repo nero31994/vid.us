@@ -2,16 +2,15 @@ const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-      { name: 'MainServer', url: 'https://mappletv.uk/watch/movie/' },
+    { name: 'MainServer', url: 'https://mappletv.uk/watch/movie/' },
     { name: 'Server1', url: 'https://vidify.top//embed/movie/' },
     { name: 'Server2', url: 'https://autoembed.pro/embed/movie/' }
-  
   ],
   tv: [
     { name: 'MainServer', url: 'https://mappletv.uk/watch/tv/' },
     { name: 'Server1', url: 'https://vidify.top/embed/tv/' },
     { name: 'Server2', url: 'https://autoembed.pro/embed/tv/' }
-      ]
+  ]
 };
 
 let currentPage = 1;
@@ -20,6 +19,26 @@ let isFetching = false;
 let timeout = null;
 let currentMode = 'movie';
 let currentItem = null;
+
+// ✅ BLOCK POPUPS (PopAds) WITHOUT SANDBOX
+window.open = () => {
+  console.warn("Popup blocked.");
+  return null;
+};
+
+// Prevent iframe click event propagation and right-click menu
+document.addEventListener("DOMContentLoaded", () => {
+  const iframe = document.getElementById("videoFrame");
+  if (iframe) {
+    iframe.addEventListener("contextmenu", e => e.preventDefault());
+  }
+
+  window.addEventListener('click', (e) => {
+    if (e.target.closest('iframe')) {
+      e.stopPropagation();
+    }
+  }, true);
+});
 
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
@@ -102,6 +121,7 @@ function displayMovies(items, clear = false) {
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
+
 function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
@@ -152,6 +172,8 @@ function openIframe(item) {
 
 function switchServer(index) {
   const iframe = document.getElementById("videoFrame");
+  iframe.src = 'about:blank'; // Clear old source first
+
   const item = currentItem;
   const mode = currentMode === 'anime' ? 'movie' : currentMode;
   const server = SERVERS[mode][index];
