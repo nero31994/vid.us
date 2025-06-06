@@ -20,6 +20,7 @@ let timeout = null;
 let currentMode = 'movie';
 let currentItem = null;
 
+// Fetch movie or TV content
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
   isFetching = true;
@@ -34,18 +35,14 @@ async function fetchContent(query = '', page = 1) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    document.getElementById("loading").style.display = "none";
-
     if (!data.results || data.results.length === 0) {
       if (page === 1) document.getElementById("movies").innerHTML = "";
       document.getElementById("error").innerText = "No results found!";
-      isFetching = false;
       return;
     }
-
     document.getElementById("error").innerText = "";
     displayMovies(data.results, page === 1);
-  } catch (err) {
+  } catch {
     document.getElementById("error").innerText = "Error fetching data!";
   } finally {
     document.getElementById("loading").style.display = "none";
@@ -53,6 +50,7 @@ async function fetchContent(query = '', page = 1) {
   }
 }
 
+// Fetch anime specifically (Japanese + animation genre)
 async function fetchAnime(page = 1) {
   if (isFetching) return;
   isFetching = true;
@@ -63,18 +61,14 @@ async function fetchAnime(page = 1) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    document.getElementById("loading").style.display = "none";
-
     if (!data.results || data.results.length === 0) {
       if (page === 1) document.getElementById("movies").innerHTML = "";
       document.getElementById("error").innerText = "No anime found!";
-      isFetching = false;
       return;
     }
-
     document.getElementById("error").innerText = "";
     displayMovies(data.results, page === 1);
-  } catch (err) {
+  } catch {
     document.getElementById("error").innerText = "Error fetching anime!";
   } finally {
     document.getElementById("loading").style.display = "none";
@@ -82,13 +76,13 @@ async function fetchAnime(page = 1) {
   }
 }
 
+// Display movie cards
 function displayMovies(items, clear = false) {
   const moviesDiv = document.getElementById("movies");
   if (clear) moviesDiv.innerHTML = "";
 
   items.forEach(item => {
     if (!item.poster_path) return;
-
     const movieEl = document.createElement("div");
     movieEl.classList.add("movie");
     movieEl.innerHTML = `
@@ -97,18 +91,18 @@ function displayMovies(items, clear = false) {
     `;
     movieEl.onclick = () => openIframe(item);
     moviesDiv.appendChild(movieEl);
-
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
 
+// Open iframe player
 function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
-
   const serverList = SERVERS[currentMode === 'anime' ? 'movie' : currentMode];
 
+  // Create server switcher only once
   let serverSwitcher = document.getElementById("serverSwitcher");
   if (!serverSwitcher) {
     serverSwitcher = document.createElement("div");
@@ -144,12 +138,12 @@ function openIframe(item) {
     container.appendChild(serverSwitcher);
   }
 
-  // Set iframe to default server (index 0)
   switchServer(0);
   document.getElementById("serverSelect").selectedIndex = 0;
   container.style.display = "block";
 }
 
+// Switch iframe server
 function switchServer(index) {
   const iframe = document.getElementById("videoFrame");
   const item = currentItem;
@@ -159,11 +153,11 @@ function switchServer(index) {
     ? `${server.url}${item.id}/1/1`
     : `${server.url}${item.id}`;
 
-  // Remove sandbox (we're not using it)
+  // Remove sandbox for full functionality
   iframe.removeAttribute("sandbox");
   iframe.src = url;
 
-  // Add click shield if it's mappletv.uk
+  // Add transparent shield for mappletv.uk
   const shieldId = "iframeShield";
   let shield = document.getElementById(shieldId);
 
@@ -188,17 +182,21 @@ function switchServer(index) {
   } else if (shield) {
     shield.style.display = "none";
   }
-
 }
 
+// Close player iframe
 function closeIframe() {
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
 
   iframe.src = "";
   container.style.display = "none";
+
+  const shield = document.getElementById("iframeShield");
+  if (shield) shield.style.display = "none";
 }
 
+// Debounce search input
 function debounceSearch() {
   clearTimeout(timeout);
   timeout = setTimeout(() => {
@@ -214,6 +212,7 @@ function debounceSearch() {
   }, 300);
 }
 
+// Switch between movie, TV, anime modes
 function switchMode(mode) {
   currentMode = mode;
   currentQuery = '';
@@ -227,6 +226,7 @@ function switchMode(mode) {
   }
 }
 
+// Lazy load images
 const lazyObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -239,6 +239,7 @@ const lazyObserver = new IntersectionObserver((entries) => {
   rootMargin: "100px"
 });
 
+// Infinite scroll
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
     currentPage++;
@@ -252,6 +253,7 @@ const sentinelObserver = new IntersectionObserver(async (entries) => {
   rootMargin: "300px"
 });
 
+// Initial load
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
 
