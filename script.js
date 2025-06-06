@@ -20,26 +20,6 @@ let timeout = null;
 let currentMode = 'movie';
 let currentItem = null;
 
-// ✅ BLOCK POPUPS (PopAds) WITHOUT SANDBOX
-window.open = () => {
-  console.warn("Popup blocked.");
-  return null;
-};
-
-// Prevent iframe click event propagation and right-click menu
-document.addEventListener("DOMContentLoaded", () => {
-  const iframe = document.getElementById("videoFrame");
-  if (iframe) {
-    iframe.addEventListener("contextmenu", e => e.preventDefault());
-  }
-
-  window.addEventListener('click', (e) => {
-    if (e.target.closest('iframe')) {
-      e.stopPropagation();
-    }
-  }, true);
-});
-
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
   isFetching = true;
@@ -172,11 +152,17 @@ function openIframe(item) {
 
 function switchServer(index) {
   const iframe = document.getElementById("videoFrame");
-  iframe.src = 'about:blank'; // Clear old source first
-
   const item = currentItem;
   const mode = currentMode === 'anime' ? 'movie' : currentMode;
   const server = SERVERS[mode][index];
+
+  // 👉 Apply sandbox only to mappletv.uk
+  if (server.url.includes("mappletv.uk")) {
+    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+  } else {
+    iframe.removeAttribute("sandbox");
+  }
+
   iframe.src = mode === 'tv'
     ? `${server.url}${item.id}/1/1`
     : `${server.url}${item.id}`;
