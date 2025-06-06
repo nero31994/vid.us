@@ -155,13 +155,40 @@ function switchServer(index) {
   const item = currentItem;
   const mode = currentMode === 'anime' ? 'movie' : currentMode;
   const server = SERVERS[mode][index];
+  const url = mode === 'tv'
+    ? `${server.url}${item.id}/1/1`
+    : `${server.url}${item.id}`;
 
-  // 👉 Apply sandbox only to mappletv.uk
+  // Remove sandbox (we're not using it)
+  iframe.removeAttribute("sandbox");
+  iframe.src = url;
+
+  // Add click shield if it's mappletv.uk
+  const shieldId = "iframeShield";
+  let shield = document.getElementById(shieldId);
+
   if (server.url.includes("mappletv.uk")) {
-    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
-  } else {
-    iframe.removeAttribute("sandbox");
+    if (!shield) {
+      shield = document.createElement("div");
+      shield.id = shieldId;
+      shield.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        background: transparent;
+      `;
+      iframe.parentNode.style.position = "relative";
+      iframe.parentNode.appendChild(shield);
+    } else {
+      shield.style.display = "block";
+    }
+  } else if (shield) {
+    shield.style.display = "none";
   }
+
 
   iframe.src = mode === 'tv'
     ? `${server.url}${item.id}/1/1`
