@@ -2,11 +2,13 @@ const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-    { name: 'Main Server', url: 'https://autoembed.pro/embed/movie/' },
+    { name: 'Server1', url: 'https://vidify.top//embed/movie/' },
+    { name: 'Server2', url: 'https://autoembed.pro/embed/movie/' },
     { name: 'Alternative', url: 'https://vidora.su/movie/' }
   ],
   tv: [
-    { name: 'Main Server', url: 'https://autoembed.pro/embed/tv/' },
+    { name: 'Server1', url: 'https://vidify.top/embed/tv/' },
+    { name: 'Server2', url: 'https://autoembed.pro/embed/tv/' },
     { name: 'Alternative', url: 'https://vidora.su/tv/' }
   ]
 };
