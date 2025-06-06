@@ -10,7 +10,7 @@ let timeout = null;
 let currentMode = 'movie';
 
 async function fetchContent(query = '', page = 1) {
-  if (isFetching || currentMode === 'anime') return; // skip if anime mode
+  if (isFetching) return;
   isFetching = true;
   document.getElementById("loading").style.display = "block";
 
@@ -98,7 +98,7 @@ function openIframe(item) {
   if (currentMode === 'movie' || currentMode === 'anime') {
     iframe.src = `${MOVIE_PROXY}${item.id}`;
   } else {
-    iframe.src = `${TV_PROXY}${item.id}/1/1`;
+    iframe.src = `${TV_PROXY}${item.id}/1/1`; // Default Season 1, Episode 1
   }
 
   container.style.display = "block";
@@ -118,6 +118,7 @@ function debounceSearch() {
     const query = document.getElementById("search").value.trim();
     currentQuery = query;
     currentPage = 1;
+
     if (currentMode === 'anime') {
       fetchAnime(currentPage);
     } else {
@@ -131,7 +132,7 @@ function switchMode(mode) {
   currentQuery = '';
   currentPage = 1;
   document.getElementById("search").value = '';
-  document.getElementById("movies").innerHTML = '';
+
   if (mode === 'anime') {
     fetchAnime();
   } else {
