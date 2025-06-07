@@ -2,14 +2,14 @@ const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-      { name: 'MainServer', url: 'https://spencerdevs.xyz/movie/' },
-    { name: 'Server1', url: 'https://vidify.top//embed/movie/' },
+      { name: 'MainServer', url: 'https://https://vidify.top//embed/movie/' },
+    { name: 'Server1', url: 'spencerdevs.xyz/movie/'' },
     { name: 'Server2', url: 'https://autoembed.pro/embed/movie/' }
   
   ],
   tv: [
-    { name: 'MainServer', url: 'https://spencerdevs.xyz/tv/' },
-    { name: 'Server1', url: 'https://vidify.top/embed/tv/' },
+    { name: 'MainServer', url: 'https://vidify.top/embed/tv/' },
+    { name: 'Server1', url: 'https://spencerdevs.xyz/tv/' },
     { name: 'Server2', url: 'https://autoembed.pro/embed/tv/' }
       ]
 };
@@ -125,7 +125,7 @@ function openIframe(item) {
     select.id = "serverSelect";
     select.style.cssText = `
       padding: 6px 12px;
-      font-size: 10px;
+      font-size: 6px;
       border-radius: 6px;
       border: 1px solid #ccc;
       background: #000;
