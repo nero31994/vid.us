@@ -3,7 +3,7 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
       { name: 'MainServer', url: 'https://https://vidify.top//embed/movie/' },
-    { name: 'Server1', url: 'spencerdevs.xyz/movie/'' },
+    { name: 'Server1', url: 'https://spencerdevs.xyz/movie/' },
     { name: 'Server2', url: 'https://autoembed.pro/embed/movie/' }
   
   ],
