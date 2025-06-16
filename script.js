@@ -56,6 +56,35 @@ async function fetchContent(query = '', page = 1) {
   }
 }
 
+async function fetchAnime(page = 1) {
+  if (isFetching) return;
+  isFetching = true;
+  document.getElementById("loading").style.display = "block";
+
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16&with_original_language=ja&page=${page}&sort_by=popularity.desc`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    document.getElementById("loading").style.display = "none";
+
+    if (!data.results || data.results.length === 0) {
+      if (page === 1) document.getElementById("movies").innerHTML = "";
+      document.getElementById("error").innerText = "No anime found!";
+      isFetching = false;
+      return;
+    }
+
+    document.getElementById("error").innerText = "";
+    displayMovies(data.results, page === 1);
+  } catch (err) {
+    document.getElementById("error").innerText = "Error fetching anime!";
+  } finally {
+    document.getElementById("loading").style.display = "none";
+    isFetching = false;
+  }
+}
+
 function displayMovies(items, clear = false) {
   const moviesDiv = document.getElementById("movies");
   if (clear) moviesDiv.innerHTML = "";
@@ -81,62 +110,203 @@ function displayMovies(items, clear = false) {
   });
 }
 
-function openEpisodeModal(item) {
-  let existingModal = document.getElementById('episodeModal');
-  if (existingModal) existingModal.remove();
+async function toggleEpisodeDropdown(container, item) {
+  let dropdown = container.querySelector(".episode-dropdown");
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+    return;
+  }
 
-  const modal = document.createElement('div');
-  modal.id = 'episodeModal';
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
-    z-index: 1002; overflow-y: auto;
-  `;
+  dropdown = document.createElement("div");
+  dropdown.className = "episode-dropdown";
+  dropdown.style.cssText = "background:#222;padding:10px;margin-top:10px;border-left:3px solid #00bcd4;border-radius:6px;color:#fff;";
+  dropdown.innerHTML = "<p>Loading episodes...</p>";
+  container.appendChild(dropdown);
 
-  const modalContent = document.createElement('div');
-  modalContent.style.cssText = `
-    background: #1e1e1e; padding: 20px; border-radius: 8px;
-    width: 90%; max-width: 600px; color: white; position: relative;
-  `;
-  modalContent.innerHTML = '<p>Loading episodes...</p>';
+  try {
+    const showRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
+    const show = await showRes.json();
 
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
+    let html = `<strong>${show.name} - Episodes</strong><br/>`;
+    for (const season of show.seasons) {
+      const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
+      const seasonData = await seasonRes.json();
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
-
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Ã—';
-  closeBtn.style.cssText = `
-    position: absolute; top: 10px; right: 15px; background: none; border: none;
-    font-size: 24px; color: white; cursor: pointer;
-  `;
-  closeBtn.onclick = () => modal.remove();
-  modalContent.appendChild(closeBtn);
-
-  fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`)
-    .then(res => res.json())
-    .then(async show => {
-      let html = `<h2 style="margin-top:0">${show.name}</h2>`;
-      for (const season of show.seasons) {
-        const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
-        const seasonData = await seasonRes.json();
-        html += `<details open><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
-        for (const ep of seasonData.episodes) {
-          html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); document.getElementById('episodeModal').remove();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
-        }
-        html += "</ul></details>";
+      html += `<details><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
+      for (const ep of seasonData.episodes) {
+        html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); event.stopPropagation();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
       }
-      modalContent.innerHTML += html;
-    })
-    .catch(err => {
-      console.error(err);
-      modalContent.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
-    });
+      html += "</ul></details>";
+    }
+
+    dropdown.innerHTML = html;
+  } catch (err) {
+    console.error(err);
+    dropdown.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
+  }
 }
 
-function toggleEpisodeDropdown(container, item) {
-  openEpisodeModal(item);
+function playEpisode(showId, season, episode) {
+  currentItem = { id: showId };
+  currentMode = "tv";
+
+  const container = document.getElementById("videoContainer");
+  const iframe = document.getElementById("videoFrame");
+
+  const serverList = SERVERS.tv;
+
+  let serverSwitcher = document.getElementById("serverSwitcher");
+  if (!serverSwitcher) {
+    serverSwitcher = document.createElement("div");
+    serverSwitcher.id = "serverSwitcher";
+    serverSwitcher.style.cssText = "position: absolute;top: 10px;left: 50%;transform: translateX(-50%);z-index: 1001;";
+
+    const select = document.createElement("select");
+    select.id = "serverSelect";
+    select.style.cssText = "padding: 6px 12px;font-size: 6px;border-radius: 6px;border: 1px solid #ccc;background: #000;color: #fff;";
+    select.onchange = () => switchEpisodeServer(select.selectedIndex, showId, season, episode);
+
+    serverList.forEach((s, i) => {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = s.name;
+      select.appendChild(option);
+    });
+
+    serverSwitcher.appendChild(select);
+    container.appendChild(serverSwitcher);
+  }
+
+  document.getElementById("serverSelect").selectedIndex = 0;
+  switchEpisodeServer(0, showId, season, episode);
+  container.style.display = "block";
 }
+
+function switchEpisodeServer(index, showId, season, episode) {
+  const iframe = document.getElementById("videoFrame");
+  const server = SERVERS.tv[index];
+  iframe.src = `${server.url}${showId}/${season}/${episode}`;
+}
+
+function openIframe(item) {
+  currentItem = item;
+  const container = document.getElementById("videoContainer");
+  const iframe = document.getElementById("videoFrame");
+
+  const serverList = SERVERS[currentMode === 'anime' ? 'movie' : currentMode];
+
+  let serverSwitcher = document.getElementById("serverSwitcher");
+  if (!serverSwitcher) {
+    serverSwitcher = document.createElement("div");
+    serverSwitcher.id = "serverSwitcher";
+    serverSwitcher.style.cssText = "position: absolute;top: 10px;left: 50%;transform: translateX(-50%);z-index: 1001;";
+
+    const select = document.createElement("select");
+    select.id = "serverSelect";
+    select.style.cssText = "padding: 6px 12px;font-size: 6px;border-radius: 6px;border: 1px solid #ccc;background: #000;color: #fff;";
+    select.onchange = () => switchServer(select.selectedIndex);
+
+    serverList.forEach((s, i) => {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = s.name;
+      select.appendChild(option);
+    });
+
+    serverSwitcher.appendChild(select);
+    container.appendChild(serverSwitcher);
+  }
+
+  switchServer(0);
+  document.getElementById("serverSelect").selectedIndex = 0;
+  container.style.display = "block";
+}
+
+function switchServer(index) {
+  const iframe = document.getElementById("videoFrame");
+  const item = currentItem;
+  const mode = currentMode === 'anime' ? 'movie' : currentMode;
+  const server = SERVERS[mode][index];
+  iframe.src = mode === 'tv'
+    ? `${server.url}${item.id}/1/1`
+    : `${server.url}${item.id}`;
+}
+
+function closeIframe() {
+  const container = document.getElementById("videoContainer");
+  const iframe = document.getElementById("videoFrame");
+
+  iframe.src = "";
+  container.style.display = "none";
+}
+
+function debounceSearch() {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    const query = document.getElementById("search").value.trim();
+    currentQuery = query;
+    currentPage = 1;
+
+    if (currentMode === 'anime') {
+      fetchAnime(currentPage);
+    } else {
+      fetchContent(currentQuery, currentPage);
+    }
+  }, 300);
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  currentQuery = '';
+  currentPage = 1;
+  document.getElementById("search").value = '';
+
+  if (mode === 'anime') {
+    fetchAnime();
+  } else {
+    fetchContent();
+  }
+}
+
+const lazyObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.src;
+      lazyObserver.unobserve(img);
+    }
+  });
+}, {
+  rootMargin: "100px"
+});
+
+const sentinelObserver = new IntersectionObserver(async (entries) => {
+  if (entries[0].isIntersecting && !isFetching) {
+    currentPage++;
+    if (currentMode === 'anime') {
+      await fetchAnime(currentPage);
+    } else {
+      await fetchContent(currentQuery, currentPage);
+    }
+  }
+}, {
+  rootMargin: "300px"
+});
+
+window.onload = async () => {
+  await fetchContent(currentQuery, currentPage);
+  const sentinel = document.getElementById("sentinel");
+  sentinelObserver.observe(sentinel);
+
+  const ensureFilled = async () => {
+    while (document.body.scrollHeight <= window.innerHeight + 100) {
+      currentPage++;
+      if (currentMode === 'anime') {
+        await fetchAnime(currentPage);
+      } else {
+        await fetchContent(currentQuery, currentPage);
+      }
+    }
+  };
+  await ensureFilled();
+};
