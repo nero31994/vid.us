@@ -94,15 +94,14 @@ function displayMovies(items, clear = false) {
 
     const movieEl = document.createElement("div");
     movieEl.classList.add("movie");
-    movieEl.innerHTML = \`
-      <img data-src="\${IMG_URL}\${item.poster_path}" alt="\${item.title || item.name}" class="lazy-image" loading="lazy">
-      <div class="overlay">\${item.title || item.name}</div>
-    \`;
+    movieEl.innerHTML = `
+      <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
+      <div class="overlay">${item.title || item.name}</div>
+    `;
 
     if (currentMode === 'tv') {
       movieEl.addEventListener("click", () => toggleEpisodeDropdown(movieEl, item));
     } else {
-      // Treat 'movie' and 'anime' the same
       movieEl.onclick = () => openIframe(item);
     }
 
@@ -125,17 +124,17 @@ async function toggleEpisodeDropdown(container, item) {
   container.appendChild(dropdown);
 
   try {
-    const showRes = await fetch(\`https://api.themoviedb.org/3/tv/\${item.id}?api_key=\${API_KEY}\`);
+    const showRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
     const show = await showRes.json();
 
-    let html = \`<strong>\${show.name} - Episodes</strong><br/>\`;
+    let html = `<strong>${show.name} - Episodes</strong><br/>`;
     for (const season of show.seasons) {
-      const seasonRes = await fetch(\`https://api.themoviedb.org/3/tv/\${item.id}/season/\${season.season_number}?api_key=\${API_KEY}\`);
+      const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
       const seasonData = await seasonRes.json();
 
-      html += \`<details><summary>Season \${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">\`;
+      html += `<details><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
       for (const ep of seasonData.episodes) {
-        html += \`<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(\${item.id}, \${season.season_number}, \${ep.episode_number}); event.stopPropagation();">Ep \${ep.episode_number}: \${ep.name}</button></li>\`;
+        html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); event.stopPropagation();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
       }
       html += "</ul></details>";
     }
@@ -186,7 +185,7 @@ function playEpisode(showId, season, episode) {
 function switchEpisodeServer(index, showId, season, episode) {
   const iframe = document.getElementById("videoFrame");
   const server = SERVERS.tv[index];
-  iframe.src = \`\${server.url}\${showId}/\${season}/\${episode}\`;
+  iframe.src = `${server.url}${showId}/${season}/${episode}`;
 }
 
 function openIframe(item) {
@@ -228,12 +227,15 @@ function switchServer(index) {
   const item = currentItem;
   const mode = currentMode === 'anime' ? 'movie' : currentMode;
   const server = SERVERS[mode][index];
-  iframe.src = mode === 'tv' ? \`\${server.url}\${item.id}/1/1\` : \`\${server.url}\${item.id}\`;
+  iframe.src = mode === 'tv'
+    ? `${server.url}${item.id}/1/1`
+    : `${server.url}${item.id}`;
 }
 
 function closeIframe() {
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
+
   iframe.src = "";
   container.style.display = "none";
 }
@@ -244,6 +246,7 @@ function debounceSearch() {
     const query = document.getElementById("search").value.trim();
     currentQuery = query;
     currentPage = 1;
+
     if (currentMode === 'anime') {
       fetchAnime(currentPage);
     } else {
@@ -257,6 +260,7 @@ function switchMode(mode) {
   currentQuery = '';
   currentPage = 1;
   document.getElementById("search").value = '';
+
   if (mode === 'anime') {
     fetchAnime();
   } else {
@@ -272,7 +276,9 @@ const lazyObserver = new IntersectionObserver((entries) => {
       lazyObserver.unobserve(img);
     }
   });
-}, { rootMargin: "100px" });
+}, {
+  rootMargin: "100px"
+});
 
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
@@ -283,7 +289,9 @@ const sentinelObserver = new IntersectionObserver(async (entries) => {
       await fetchContent(currentQuery, currentPage);
     }
   }
-}, { rootMargin: "300px" });
+}, {
+  rootMargin: "300px"
+});
 
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
