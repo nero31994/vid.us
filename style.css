@@ -256,14 +256,6 @@ body {
   border: 1px solid #444;
   border-radius: 8px;
 }
-.episode-dropdown {
-  background: #222;
-  padding: 10px;
-  margin-top: 10px;
-  border-left: 3px solid #00bcd4;
-  border-radius: 6px;
-  color: #fff;
-}
 .episode-dropdown button {
   background: #00bcd4;
   border: none;
