@@ -102,6 +102,7 @@ function displayMovies(items, clear = false) {
     if (currentMode === 'tv') {
       movieEl.addEventListener("click", () => toggleEpisodeDropdown(movieEl, item));
     } else {
+      // Treat 'movie' and 'anime' the same
       movieEl.onclick = () => openIframe(item);
     }
 
