@@ -23,20 +23,6 @@ let timeout = null;
 let currentMode = 'movie';
 let currentItem = null;
 
-function createEpisodeModal() {
-  const modal = document.createElement('div');
-  modal.id = 'episodeModal';
-  modal.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:2000;background-color:rgba(0,0,0,0.95);color:#fff;overflow:auto;padding:20px;';
-  modal.innerHTML = '<button onclick="closeEpisodeModal()" style="position:absolute;top:10px;right:20px;font-size:2em;background:none;color:#fff;border:none;">&times;</button><div id="episodeContent"></div>';
-  document.body.appendChild(modal);
-}
-createEpisodeModal();
-
-function closeEpisodeModal() {
-  document.getElementById("episodeModal").style.display = "none";
-  document.getElementById("episodeContent").innerHTML = "";
-}
-
 async function fetchContent(query = '', page = 1) {
   if (isFetching) return;
   isFetching = true;
@@ -70,6 +56,35 @@ async function fetchContent(query = '', page = 1) {
   }
 }
 
+async function fetchAnime(page = 1) {
+  if (isFetching) return;
+  isFetching = true;
+  document.getElementById("loading").style.display = "block";
+
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16&with_original_language=ja&page=${page}&sort_by=popularity.desc`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    document.getElementById("loading").style.display = "none";
+
+    if (!data.results || data.results.length === 0) {
+      if (page === 1) document.getElementById("movies").innerHTML = "";
+      document.getElementById("error").innerText = "No anime found!";
+      isFetching = false;
+      return;
+    }
+
+    document.getElementById("error").innerText = "";
+    displayMovies(data.results, page === 1);
+  } catch (err) {
+    document.getElementById("error").innerText = "Error fetching anime!";
+  } finally {
+    document.getElementById("loading").style.display = "none";
+    isFetching = false;
+  }
+}
+
 function displayMovies(items, clear = false) {
   const moviesDiv = document.getElementById("movies");
   if (clear) moviesDiv.innerHTML = "";
@@ -85,7 +100,7 @@ function displayMovies(items, clear = false) {
     `;
 
     if (currentMode === 'tv') {
-      movieEl.addEventListener("click", () => showEpisodesInModal(item));
+      movieEl.addEventListener("click", () => toggleEpisodeDropdown(movieEl, item));
     } else {
       movieEl.onclick = () => openIframe(item);
     }
@@ -95,31 +110,39 @@ function displayMovies(items, clear = false) {
   });
 }
 
-async function showEpisodesInModal(item) {
-  const contentDiv = document.getElementById("episodeContent");
-  contentDiv.innerHTML = `<p>Loading episodes...</p>`;
-  document.getElementById("episodeModal").style.display = "block";
+async function toggleEpisodeDropdown(container, item) {
+  let dropdown = container.querySelector(".episode-dropdown");
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+    return;
+  }
+
+  dropdown = document.createElement("div");
+  dropdown.className = "episode-dropdown";
+  dropdown.style.cssText = "background:#222;padding:10px;margin-top:10px;border-left:3px solid #00bcd4;border-radius:6px;color:#fff;";
+  dropdown.innerHTML = "<p>Loading episodes...</p>";
+  container.appendChild(dropdown);
 
   try {
     const showRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
     const show = await showRes.json();
 
-    let html = `<h2>${show.name} - Episodes</h2>`;
+    let html = `<strong>${show.name} - Episodes</strong><br/>`;
     for (const season of show.seasons) {
       const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
       const seasonData = await seasonRes.json();
 
-      html += `<details><summary><strong>Season ${season.season_number}</strong></summary><ul style="list-style:none;padding-left:10px;">`;
+      html += `<details><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
       for (const ep of seasonData.episodes) {
-        html += `<li style="margin:6px 0;"><button style="padding:5px 10px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); event.stopPropagation();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
+        html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); event.stopPropagation();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
       }
-      html += `</ul></details>`;
+      html += "</ul></details>";
     }
 
-    contentDiv.innerHTML = html;
+    dropdown.innerHTML = html;
   } catch (err) {
-    contentDiv.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
     console.error(err);
+    dropdown.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
   }
 }
 
@@ -129,6 +152,7 @@ function playEpisode(showId, season, episode) {
 
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
+
   const serverList = SERVERS.tv;
 
   let serverSwitcher = document.getElementById("serverSwitcher");
@@ -168,6 +192,7 @@ function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
+
   const serverList = SERVERS[currentMode === 'anime' ? 'movie' : currentMode];
 
   let serverSwitcher = document.getElementById("serverSwitcher");
@@ -202,12 +227,15 @@ function switchServer(index) {
   const item = currentItem;
   const mode = currentMode === 'anime' ? 'movie' : currentMode;
   const server = SERVERS[mode][index];
-  iframe.src = mode === 'tv' ? `${server.url}${item.id}/1/1` : `${server.url}${item.id}`;
+  iframe.src = mode === 'tv'
+    ? `${server.url}${item.id}/1/1`
+    : `${server.url}${item.id}`;
 }
 
 function closeIframe() {
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
+
   iframe.src = "";
   container.style.display = "none";
 }
@@ -218,6 +246,7 @@ function debounceSearch() {
     const query = document.getElementById("search").value.trim();
     currentQuery = query;
     currentPage = 1;
+
     if (currentMode === 'anime') {
       fetchAnime(currentPage);
     } else {
@@ -231,6 +260,7 @@ function switchMode(mode) {
   currentQuery = '';
   currentPage = 1;
   document.getElementById("search").value = '';
+
   if (mode === 'anime') {
     fetchAnime();
   } else {
@@ -246,7 +276,9 @@ const lazyObserver = new IntersectionObserver((entries) => {
       lazyObserver.unobserve(img);
     }
   });
-}, { rootMargin: "100px" });
+}, {
+  rootMargin: "100px"
+});
 
 const sentinelObserver = new IntersectionObserver(async (entries) => {
   if (entries[0].isIntersecting && !isFetching) {
@@ -257,11 +289,14 @@ const sentinelObserver = new IntersectionObserver(async (entries) => {
       await fetchContent(currentQuery, currentPage);
     }
   }
-}, { rootMargin: "300px" });
+}, {
+  rootMargin: "300px"
+});
 
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
-  sentinelObserver.observe(document.getElementById("sentinel"));
+  const sentinel = document.getElementById("sentinel");
+  sentinelObserver.observe(sentinel);
 
   const ensureFilled = async () => {
     while (document.body.scrollHeight <= window.innerHeight + 100) {
