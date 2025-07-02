@@ -6,7 +6,7 @@ const SERVERS = {
     { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
     { name: 'MainServer2', url: 'https://nerflixprox.arenaofvalorph937.workers.dev/proxy?id=' },
     { name: 'Server1', url: 'https://spencerdevs.xyz/movie/' },
-    { name: 'Server2', url: 'https://vidify.top/embed/movie/' }
+    { name: 'Server2', url: 'https://vidify.top/embed/tv/' }
   ],
   tv: [
     { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
