@@ -3,16 +3,16 @@ const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-    { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
+    { name: 'MainServer', url: 'https://vidify.top//embed/movie/' },
     { name: 'MainServer2', url: 'https://nerflixprox.arenaofvalorph937.workers.dev/proxy?id=' },
     { name: 'Server1', url: 'https://spencerdevs.xyz/movie/' },
-    { name: 'Server2', url: 'https://vidify.top/embed/tv/' }
+    { name: 'Server2', url: 'https://autoembed.pro/embed/movie/' }
   ],
   tv: [
-    { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
+    { name: 'MainServer', url: 'https://vidify.top/embed/tv/' },
     { name: 'MainServer2', url: 'https://nerflixprox.arenaofvalorph937.workers.dev/proxy?id=' },
     { name: 'Server1', url: 'https://spencerdevs.xyz/tv/' },
-    { name: 'Server2', url: 'https://vidify.top/embed/tv/' }
+    { name: 'Server2', url: 'https://autoembed.pro/embed/tv/' }
   ]
 };
 
