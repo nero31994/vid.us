@@ -110,7 +110,69 @@ function displayMovies(items, clear = false) {
   });
 }
 
+
 async function toggleEpisodeDropdown(container, item) {
+  openEpisodeModal(item);
+}
+
+function openEpisodeModal(item) {
+  let existingModal = document.getElementById('episodeModal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'episodeModal';
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
+    z-index: 1002; overflow-y: auto;
+  `;
+
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    background: #1e1e1e; padding: 20px; border-radius: 8px;
+    width: 90%; max-width: 600px; color: white; position: relative;
+  `;
+  modalContent.innerHTML = '<p>Loading episodes...</p>';
+
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  // Add close button
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '×';
+  closeBtn.style.cssText = `
+    position: absolute; top: 10px; right: 15px; background: none; border: none;
+    font-size: 24px; color: white; cursor: pointer;
+  `;
+  closeBtn.onclick = () => modal.remove();
+  modalContent.appendChild(closeBtn);
+
+  // Fetch and render episodes
+  fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`)
+    .then(res => res.json())
+    .then(async show => {
+      let html = `<h2 style="margin-top:0">${show.name}</h2>`;
+      for (const season of show.seasons) {
+        const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
+        const seasonData = await seasonRes.json();
+        html += `<details open><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
+        for (const ep of seasonData.episodes) {
+          html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); document.getElementById('episodeModal').remove();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
+        }
+        html += "</ul></details>";
+      }
+      modalContent.innerHTML += html;
+    })
+    .catch(err => {
+      console.error(err);
+      modalContent.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
+    });
+}
+
   let dropdown = container.querySelector(".episode-dropdown");
   if (dropdown) {
     dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
