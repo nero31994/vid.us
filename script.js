@@ -2,7 +2,7 @@ const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-      { name: 'MainServer', url: 'https://autoembed.pro/embed/tv/' },
+      { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
  
   ],
   tv: [
