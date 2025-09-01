@@ -2,13 +2,11 @@ const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-      { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
- 
+    { url: 'https://autoembed.pro/embed/movie/' }
   ],
   tv: [
-    { name: 'MainServer', url: 'https://autoembed.pro/embed/tv/' },
-    
-      ]
+    { url: 'https://autoembed.pro/embed/tv/' }
+  ]
 };
 
 let currentPage = 1;
@@ -99,62 +97,19 @@ function displayMovies(items, clear = false) {
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
+
 function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
 
-  const serverList = SERVERS[currentMode === 'anime' ? 'movie' : currentMode];
-
-  let serverSwitcher = document.getElementById("serverSwitcher");
-  if (!serverSwitcher) {
-    serverSwitcher = document.createElement("div");
-    serverSwitcher.id = "serverSwitcher";
-    serverSwitcher.style.cssText = `
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1001;
-    `;
-
-    const select = document.createElement("select");
-    select.id = "serverSelect";
-    select.style.cssText = `
-      padding: 6px 12px;
-      font-size: 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #000;
-      color: #fff;
-    `;
-    select.onchange = () => switchServer(select.selectedIndex);
-
-    serverList.forEach((s, i) => {
-      const option = document.createElement("option");
-      option.value = i;
-      option.textContent = s.name;
-      select.appendChild(option);
-    });
-
-    serverSwitcher.appendChild(select);
-    container.appendChild(serverSwitcher);
-  }
-
-  // Set iframe to default server (index 0)
-  switchServer(0);
-  document.getElementById("serverSelect").selectedIndex = 0;
-  container.style.display = "block";
-}
-
-function switchServer(index) {
-  const iframe = document.getElementById("videoFrame");
-  const item = currentItem;
-  const mode = currentMode === 'anime' ? 'movie' : currentMode;
-  const server = SERVERS[mode][index];
-  iframe.src = mode === 'tv'
+  // Always use the only server
+  const server = SERVERS[currentMode === 'anime' ? 'movie' : currentMode][0];
+  iframe.src = currentMode === 'tv'
     ? `${server.url}${item.id}/1/1`
     : `${server.url}${item.id}`;
+
+  container.style.display = "block";
 }
 
 function closeIframe() {
