@@ -145,7 +145,11 @@
       videoContainer.style.display = "none";
     }
   </script>
-
+<div id="videoContainer" style="display:none;">
+  <iframe id="videoFrame" allowfullscreen></iframe>
+  <div id="episodeSelector" style="display:none; margin-top:10px;"></div>
+  <button onclick="closeIframe()">Close</button>
+</div>
   <script src="script.js"></script>
   <script src="remote.js"></script>
     <script src="modal.js"></script>
