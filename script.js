@@ -143,7 +143,7 @@ function openEpisodeModal(item) {
 
   // Add close button
   const closeBtn = document.createElement('button');
-  closeBtn.textContent = '×';
+  closeBtn.textContent = 'Ã—';
   closeBtn.style.cssText = `
     position: absolute; top: 10px; right: 15px; background: none; border: none;
     font-size: 24px; color: white; cursor: pointer;
