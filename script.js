@@ -1,19 +1,14 @@
-
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
   movie: [
-    { name: 'MainServer', url: 'https://vidify.top//embed/movie/' },
-    { name: 'MainServer2', url: 'https://nerflixprox.arenaofvalorph937.workers.dev/proxy?id=' },
-    { name: 'Server1', url: 'https://spencerdevs.xyz/movie/' },
-    { name: 'Server2', url: 'https://autoembed.pro/embed/movie/' }
+      { name: 'MainServer', url: 'https://autoembed.pro/embed/tv/' },
+ 
   ],
   tv: [
-    { name: 'MainServer', url: 'https://vidify.top/embed/tv/' },
-    { name: 'MainServer2', url: 'https://nerflixprox.arenaofvalorph937.workers.dev/proxy?id=' },
-    { name: 'Server1', url: 'https://spencerdevs.xyz/tv/' },
-    { name: 'Server2', url: 'https://autoembed.pro/embed/tv/' }
-  ]
+    { name: 'MainServer', url: 'https://autoembed.pro/embed/tv/' },
+    
+      ]
 };
 
 let currentPage = 1;
@@ -98,158 +93,12 @@ function displayMovies(items, clear = false) {
       <img data-src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" class="lazy-image" loading="lazy">
       <div class="overlay">${item.title || item.name}</div>
     `;
-
-    if (currentMode === 'tv') {
-      movieEl.addEventListener("click", () => toggleEpisodeDropdown(movieEl, item));
-    } else {
-      movieEl.onclick = () => openIframe(item);
-    }
-
+    movieEl.onclick = () => openIframe(item);
     moviesDiv.appendChild(movieEl);
+
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
-
-
-async function toggleEpisodeDropdown(container, item) {
-  openEpisodeModal(item);
-}
-
-function openEpisodeModal(item) {
-  let existingModal = document.getElementById('episodeModal');
-  if (existingModal) existingModal.remove();
-
-  const modal = document.createElement('div');
-  modal.id = 'episodeModal';
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
-    z-index: 1002; overflow-y: auto;
-  `;
-
-  const modalContent = document.createElement('div');
-  modalContent.style.cssText = `
-    background: #1e1e1e; padding: 20px; border-radius: 8px;
-    width: 90%; max-width: 600px; color: white; position: relative;
-  `;
-  modalContent.innerHTML = '<p>Loading episodes...</p>';
-
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
-
-  // Add close button
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Ã—';
-  closeBtn.style.cssText = `
-    position: absolute; top: 10px; right: 15px; background: none; border: none;
-    font-size: 24px; color: white; cursor: pointer;
-  `;
-  closeBtn.onclick = () => modal.remove();
-  modalContent.appendChild(closeBtn);
-
-  // Fetch and render episodes
-  fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`)
-    .then(res => res.json())
-    .then(async show => {
-      let html = `<h2 style="margin-top:0">${show.name}</h2>`;
-      for (const season of show.seasons) {
-        const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
-        const seasonData = await seasonRes.json();
-        html += `<details open><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
-        for (const ep of seasonData.episodes) {
-          html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); document.getElementById('episodeModal').remove();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
-        }
-        html += "</ul></details>";
-      }
-      modalContent.innerHTML += html;
-    })
-    .catch(err => {
-      console.error(err);
-      modalContent.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
-    });
-}
-
-  let dropdown = container.querySelector(".episode-dropdown");
-  if (dropdown) {
-    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
-    return;
-  }
-
-  dropdown = document.createElement("div");
-  dropdown.className = "episode-dropdown";
-  dropdown.style.cssText = "background:#222;padding:10px;margin-top:10px;border-left:3px solid #00bcd4;border-radius:6px;color:#fff;";
-  dropdown.innerHTML = "<p>Loading episodes...</p>";
-  container.appendChild(dropdown);
-
-  try {
-    const showRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
-    const show = await showRes.json();
-
-    let html = `<strong>${show.name} - Episodes</strong><br/>`;
-    for (const season of show.seasons) {
-      const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${item.id}/season/${season.season_number}?api_key=${API_KEY}`);
-      const seasonData = await seasonRes.json();
-
-      html += `<details><summary>Season ${season.season_number}</summary><ul style="list-style:none;padding-left:10px;">`;
-      for (const ep of seasonData.episodes) {
-        html += `<li style="margin:4px 0;"><button style="padding:4px 8px;" onclick="playEpisode(${item.id}, ${season.season_number}, ${ep.episode_number}); event.stopPropagation();">Ep ${ep.episode_number}: ${ep.name}</button></li>`;
-      }
-      html += "</ul></details>";
-    }
-
-    dropdown.innerHTML = html;
-  } catch (err) {
-    console.error(err);
-    dropdown.innerHTML = "<p style='color:red;'>Failed to load episodes</p>";
-  }
-}
-
-function playEpisode(showId, season, episode) {
-  currentItem = { id: showId };
-  currentMode = "tv";
-
-  const container = document.getElementById("videoContainer");
-  const iframe = document.getElementById("videoFrame");
-
-  const serverList = SERVERS.tv;
-
-  let serverSwitcher = document.getElementById("serverSwitcher");
-  if (!serverSwitcher) {
-    serverSwitcher = document.createElement("div");
-    serverSwitcher.id = "serverSwitcher";
-    serverSwitcher.style.cssText = "position: absolute;top: 10px;left: 50%;transform: translateX(-50%);z-index: 1001;";
-
-    const select = document.createElement("select");
-    select.id = "serverSelect";
-    select.style.cssText = "padding: 6px 12px;font-size: 6px;border-radius: 6px;border: 1px solid #ccc;background: #000;color: #fff;";
-    select.onchange = () => switchEpisodeServer(select.selectedIndex, showId, season, episode);
-
-    serverList.forEach((s, i) => {
-      const option = document.createElement("option");
-      option.value = i;
-      option.textContent = s.name;
-      select.appendChild(option);
-    });
-
-    serverSwitcher.appendChild(select);
-    container.appendChild(serverSwitcher);
-  }
-
-  document.getElementById("serverSelect").selectedIndex = 0;
-  switchEpisodeServer(0, showId, season, episode);
-  container.style.display = "block";
-}
-
-function switchEpisodeServer(index, showId, season, episode) {
-  const iframe = document.getElementById("videoFrame");
-  const server = SERVERS.tv[index];
-  iframe.src = `${server.url}${showId}/${season}/${episode}`;
-}
-
 function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
@@ -261,11 +110,24 @@ function openIframe(item) {
   if (!serverSwitcher) {
     serverSwitcher = document.createElement("div");
     serverSwitcher.id = "serverSwitcher";
-    serverSwitcher.style.cssText = "position: absolute;top: 10px;left: 50%;transform: translateX(-50%);z-index: 1001;";
+    serverSwitcher.style.cssText = `
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+    `;
 
     const select = document.createElement("select");
     select.id = "serverSelect";
-    select.style.cssText = "padding: 6px 12px;font-size: 6px;border-radius: 6px;border: 1px solid #ccc;background: #000;color: #fff;";
+    select.style.cssText = `
+      padding: 6px 12px;
+      font-size: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #000;
+      color: #fff;
+    `;
     select.onchange = () => switchServer(select.selectedIndex);
 
     serverList.forEach((s, i) => {
@@ -279,6 +141,7 @@ function openIframe(item) {
     container.appendChild(serverSwitcher);
   }
 
+  // Set iframe to default server (index 0)
   switchServer(0);
   document.getElementById("serverSelect").selectedIndex = 0;
   container.style.display = "block";
@@ -357,6 +220,7 @@ const sentinelObserver = new IntersectionObserver(async (entries) => {
 
 window.onload = async () => {
   await fetchContent(currentQuery, currentPage);
+
   const sentinel = document.getElementById("sentinel");
   sentinelObserver.observe(sentinel);
 
