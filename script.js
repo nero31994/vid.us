@@ -1,8 +1,14 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const SERVERS = {
-  movie: { url: 'https://autoembed.pro/embed/movie/' },
-  tv: { url: 'https://autoembed.pro/embed/tv/' }
+  movie: [
+      { name: 'MainServer', url: 'https://autoembed.pro/embed/movie/' },
+ 
+  ],
+  tv: [
+    { name: 'MainServer', url: 'https://autoembed.pro/embed/tv/' },
+    
+      ]
 };
 
 let currentPage = 1;
@@ -93,68 +99,70 @@ function displayMovies(items, clear = false) {
     lazyObserver.observe(movieEl.querySelector('img'));
   });
 }
-
-async function openIframe(item) {
+function openIframe(item) {
   currentItem = item;
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
-  const episodeSelector = document.getElementById("episodeSelector");
 
-  if (currentMode === 'tv') {
-    // fetch TV show details to get number of seasons
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}`);
-    const data = await res.json();
+  const serverList = SERVERS[currentMode === 'anime' ? 'movie' : currentMode];
 
-    const seasons = data.seasons.filter(s => s.season_number > 0); // skip specials
-    if (seasons.length > 0) {
-      // load first season episodes
-      loadEpisodes(item.id, seasons[0].season_number);
-    }
+  let serverSwitcher = document.getElementById("serverSwitcher");
+  if (!serverSwitcher) {
+    serverSwitcher = document.createElement("div");
+    serverSwitcher.id = "serverSwitcher";
+    serverSwitcher.style.cssText = `
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+    `;
 
-    episodeSelector.style.display = "block";
-  } else {
-    // Movie mode
-    const server = SERVERS.movie;
-    iframe.src = `${server.url}${item.id}`;
-    episodeSelector.style.display = "none";
+    const select = document.createElement("select");
+    select.id = "serverSelect";
+    select.style.cssText = `
+      padding: 6px 12px;
+      font-size: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #000;
+      color: #fff;
+    `;
+    select.onchange = () => switchServer(select.selectedIndex);
+
+    serverList.forEach((s, i) => {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = s.name;
+      select.appendChild(option);
+    });
+
+    serverSwitcher.appendChild(select);
+    container.appendChild(serverSwitcher);
   }
 
+  // Set iframe to default server (index 0)
+  switchServer(0);
+  document.getElementById("serverSelect").selectedIndex = 0;
   container.style.display = "block";
 }
 
-async function loadEpisodes(showId, seasonNumber) {
-  const episodeSelector = document.getElementById("episodeSelector");
-  const res = await fetch(`https://api.themoviedb.org/3/tv/${showId}/season/${seasonNumber}?api_key=${API_KEY}`);
-  const data = await res.json();
-
-  episodeSelector.innerHTML = "";
-  data.episodes.forEach(ep => {
-    const btn = document.createElement("button");
-    btn.textContent = `Ep ${ep.episode_number}`;
-    btn.onclick = () => playEpisode(showId, seasonNumber, ep.episode_number);
-    episodeSelector.appendChild(btn);
-  });
-
-  // auto-play first episode
-  if (data.episodes.length > 0) {
-    playEpisode(showId, seasonNumber, 1);
-  }
-}
-
-function playEpisode(showId, season, episode) {
+function switchServer(index) {
   const iframe = document.getElementById("videoFrame");
-  const server = SERVERS.tv;
-  iframe.src = `${server.url}${showId}/${season}/${episode}`;
+  const item = currentItem;
+  const mode = currentMode === 'anime' ? 'movie' : currentMode;
+  const server = SERVERS[mode][index];
+  iframe.src = mode === 'tv'
+    ? `${server.url}${item.id}/1/1`
+    : `${server.url}${item.id}`;
 }
 
 function closeIframe() {
   const container = document.getElementById("videoContainer");
   const iframe = document.getElementById("videoFrame");
-  const episodeSelector = document.getElementById("episodeSelector");
 
   iframe.src = "";
   container.style.display = "none";
-  episodeSelector.style.display = "none";
 }
 
 function debounceSearch() {
