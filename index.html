@@ -14,36 +14,133 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="all"/>
 
   <style>
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
     img.logo {width: 140px; height: auto;}
     .intro-screen img {width: 220px; height: auto;}
     .intro-screen.fade-out {opacity: 0; transition: opacity 1s ease;}
     .intro-screen.hidden {display: none;}
 
-    /* ✅ Larger buttons for TV remotes */
-    .controls button, .search-container button {
-      font-size: 1.8rem;
+    /* ✅ Sidebar */
+    .sidebar {
+      width: 70px;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 0;
+      border-right: 1px solid #222;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      position: relative;
     }
 
-    .search-input {
-      font-size: 1.2rem;
+    .sidebar.expanded {
+      width: 220px;
     }
 
-    /* ✅ Focus highlight for TV navigation */
-    button:focus, input:focus, .movie-item:focus {
-      outline: 3px solid #00adee;
-      outline-offset: 4px;
+    /* ✅ Toggle button */
+    .toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #fff;
+      border: none;
+      background: none;
+      margin-bottom: 20px;
     }
 
-    /* ✅ Movie grid spacing */
+    /* ✅ Controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 0 8px;
+    }
+
+    .controls button {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.1rem;
+      width: 100%;
+    }
+
+    .controls button i {
+      font-size: 1.4rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .controls button span {
+      opacity: 0;
+      white-space: nowrap;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar.expanded .controls button span {
+      opacity: 1;
+    }
+
+    /* ✅ Search */
+    .search-container {
+      display: flex;
+      align-items: center;
+      padding: 10px 8px;
+    }
+
+    .search-container input {
+      flex: 1;
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #111;
+      color: #fff;
+      margin-left: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar.expanded .search-container input {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .search-container input:focus {
+      border-color: #00adee;
+      box-shadow: 0 0 6px #00adee;
+    }
+
+    /* ✅ Content */
+    main {
+      flex: 1;
+      overflow-y: auto;
+    }
+
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 15px;
       padding: 15px;
-    }
-
-    .movie-item {
-      cursor: pointer;
     }
 
     /* ✅ Video container fullscreen */
@@ -57,60 +154,14 @@
     }
 
     #videoContainer button {
-      font-size: 2.5rem;
-    }
-
-    /* ✅ Center all icons inside buttons */
-    .controls button,
-    .search-container button,
-    #videoContainer button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      vertical-align: middle;
-      line-height: 1;
-      padding: 12px;
-      border-radius: 50%;
+      font-size: 2rem;
+      position: absolute;
+      top: 10px;
+      right: 10px;
       background: none;
       border: none;
       color: #fff;
       cursor: pointer;
-    }
-
-    /* ✅ Search container layout */
-    .search-container {
-      display: inline-flex;
-      align-items: center;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    /* ✅ Search input hidden by default */
-    .search-input {
-      width: 0;
-      opacity: 0;
-      pointer-events: none;
-      margin-left: 8px;
-      font-size: 1.2rem;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #111;
-      color: #fff;
-      transition: width 0.3s ease, opacity 0.3s ease;
-    }
-
-    /* ✅ Show input when active */
-    .search-container.active .search-input {
-      width: 200px;
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* ✅ Glow when focused */
-    .search-input:focus {
-      border-color: #00adee;
-      box-shadow: 0 0 6px #00adee;
     }
   </style>
 </head>
@@ -120,18 +171,19 @@
     <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" loading="lazy"/>
   </div>
 
-  <!-- ✅ Header -->
-  <header class="bottom-menu">
+  <!-- ✅ Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
     <div class="controls">
-      <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i></button>
-      <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i></button>
-      <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-dragon"></i></button>
-      <div class="search-container">
-        <button class="search-toggle" onclick="toggleSearch()" title="Search"><i class="fas fa-search"></i></button>
-        <input id="search" type="text" class="search-input" placeholder="Search..." oninput="debounceSearch()" onblur="hideSearch()"/>
-      </div>
+      <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i><span>Movies</span></button>
+      <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i><span>TV Series</span></button>
+      <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-dragon"></i><span>Anime</span></button>
     </div>
-  </header>
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input id="search" type="text" placeholder="Search..." oninput="debounceSearch()"/>
+    </div>
+  </aside>
 
   <!-- ✅ Content -->
   <main>
@@ -143,7 +195,7 @@
 
   <!-- ✅ Player -->
   <div id="videoContainer">
-    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;">×</button>
+    <button onclick="closeIframe()">×</button>
     <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none"></iframe>
   </div>
 
@@ -160,13 +212,10 @@
       }
     });
 
-    // ✅ Search placeholder adaptive
-    function updatePlaceholder(){
-      document.getElementById("search").placeholder =
-        window.innerWidth < 500 ? "Search" : "Search for movies or TV shows...";
+    // ✅ Sidebar toggle
+    function toggleSidebar(){
+      document.getElementById("sidebar").classList.toggle("expanded");
     }
-    window.addEventListener("resize",updatePlaceholder);
-    window.addEventListener("DOMContentLoaded",updatePlaceholder);
 
     // ✅ Debounced search
     let debounceTimeout;
@@ -178,15 +227,7 @@
       },300);
     }
 
-    // ✅ Search toggle
-    function toggleSearch(){
-      const c=document.querySelector(".search-container"), s=document.getElementById("search");
-      c.classList.toggle("active");
-      c.classList.contains("active")?s.focus():s.blur();
-    }
-    function hideSearch(){setTimeout(()=>document.querySelector(".search-container").classList.remove("active"),200)}
-
-    // ✅ Dummy functions (replace with TMDB/Movie API later)
+    // ✅ Dummy functions
     function switchMode(m){console.log("Switched to:",m)}
     function searchMovies(q){console.log("Searching:",q)}
     function clearMovies(){document.getElementById("movies").innerHTML=""}
@@ -201,7 +242,7 @@
       vf.src=""; vc.style.display="none";
     }
 
-    // ✅ Remote navigation for TV
+    // ✅ Remote navigation
     document.addEventListener("keydown",(e)=>{
       const focusable=document.querySelectorAll("button, .movie-item, input");
       let index=[...focusable].indexOf(document.activeElement);
@@ -212,12 +253,13 @@
         case "ArrowDown": if(index+3<focusable.length) focusable[index+3].focus(); break;
         case "ArrowUp": if(index-3>=0) focusable[index-3].focus(); break;
         case "Enter": document.activeElement.click?.(); break;
-        case "Backspace": closeIframe(); break; // TV back button closes player
+        case "Backspace": closeIframe(); break;
+        case "Escape": document.getElementById("sidebar").classList.remove("expanded"); break;
       }
     });
   </script>
 
-  <!-- ✅ External scripts (non-blocking) -->
+  <!-- ✅ External scripts -->
   <script src="https://vid-us.vercel.app/script.js" defer></script>
   <script src="https://vid-us.vercel.app/remote.js" defer></script>
   <script src="https://vid-us.vercel.app/modal.js" defer></script>
