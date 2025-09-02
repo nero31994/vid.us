@@ -1,50 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=0.8" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Movie & TV Explorer</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- ✅ Preload CSS -->
+  <link rel="preload" href="https://vid-us.vercel.app/style.css" as="style"/>
+  <link rel="stylesheet" href="https://vid-us.vercel.app/style.css"/>
+
+  <!-- ✅ Font Awesome -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="all"/>
+
+  <style>
+    img.logo{width:120px;height:auto}
+    .intro-screen img{width:200px;height:auto}
+    .intro-screen.fade-out{opacity:0;transition:opacity 1s ease}
+    .intro-screen.hidden{display:none}
+  </style>
 </head>
 <body>
-  <!-- ✅ Full-Screen Intro Screen -->
+  <!-- ✅ Intro -->
   <div id="intro-screen" class="intro-screen">
-    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" />
+    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" loading="lazy"/>
   </div>
 
-  <!-- ✅ Sticky Header with Logo & Search -->
+  <!-- ✅ Header -->
   <header class="bottom-menu">
-    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" />
-
+    <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" loading="lazy"/>
     <div class="controls">
-      <button onclick="switchMode('movie')" title="Movies">
-        <i class="fas fa-film"></i>
-      </button>
-      <button onclick="switchMode('tv')" title="TV Series">
-        <i class="fas fa-tv"></i>
-      </button>
-      <button onclick="switchMode('anime')" title="Anime">
-        <i class="fas fa-dragon"></i>
-      </button>
-
+      <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i></button>
+      <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i></button>
+      <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-dragon"></i></button>
       <div class="search-container">
-        <button class="search-toggle" onclick="toggleSearch()" title="Search">
-          <i class="fas fa-search"></i>
-        </button>
-        <input
-          id="search"
-          type="text"
-          class="search-input"
-          placeholder="Search for movies or TV shows..."
-          oninput="debounceSearch()"
-          onblur="hideSearch()"
-        />
+        <button class="search-toggle" onclick="toggleSearch()" title="Search"><i class="fas fa-search"></i></button>
+        <input id="search" type="text" class="search-input" placeholder="Search..." oninput="debounceSearch()" onblur="hideSearch()"/>
       </div>
     </div>
   </header>
 
-  <!-- ✅ Movie Content Section -->
+  <!-- ✅ Content -->
   <main>
     <div id="movies" class="movie-grid"></div>
     <div id="sentinel"></div>
@@ -52,102 +48,20 @@
     <div id="error"></div>
   </main>
 
-  <!-- ✅ Full-Screen Video Player -->
-  <div id="videoContainer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; background:black;">
-    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;font-size:2rem;color:white;">&times;</button>
-    <iframe id="videoFrame" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
+  <!-- ✅ Player -->
+  <div id="videoContainer" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;background:#000">
+    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;font-size:2rem;color:#fff">×</button>
+    <iframe id="videoFrame" allowfullscreen style="width:100%;height:100%;border:none"></iframe>
   </div>
 
-  <!-- ✅ Scripts -->
+  <!-- ✅ Minified Inline JS -->
   <script>
-    // Intro Screen Fade
-    window.addEventListener("load", function () {
-      const introScreen = document.querySelector(".intro-screen");
-      if (introScreen) {
-        setTimeout(function () {
-          introScreen.classList.add("fade-out");
-          setTimeout(() => {
-            introScreen.classList.add("hidden");
-          }, 1000);
-        }, 1500);
-      }
-    });
-
-    // Responsive Placeholder
-    function updatePlaceholder() {
-      const searchInput = document.getElementById("search");
-      if (window.innerWidth < 500) {
-        searchInput.placeholder = "Search";
-      } else {
-        searchInput.placeholder = "Search for movies or TV shows...";
-      }
-    }
-
-    window.addEventListener("resize", updatePlaceholder);
-    window.addEventListener("DOMContentLoaded", updatePlaceholder);
-
-    // Search Logic + UI
-    let debounceTimeout;
-
-    function debounceSearch() {
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
-        const query = document.getElementById("search").value.trim();
-        if (query.length > 0) {
-          searchMovies(query);
-        } else {
-          clearMovies();
-        }
-      }, 300);
-    }
-
-    function toggleSearch() {
-      const container = document.querySelector('.search-container');
-      const input = document.getElementById('search');
-      container.classList.toggle('active');
-      if (container.classList.contains('active')) {
-        input.focus();
-      } else {
-        input.blur();
-      }
-    }
-
-    function hideSearch() {
-      const container = document.querySelector('.search-container');
-      setTimeout(() => {
-        container.classList.remove('active');
-      }, 200);
-    }
-
-    function switchMode(mode) {
-      console.log("Switched to:", mode);
-    }
-
-    function searchMovies(query) {
-      console.log("Searching for:", query);
-    }
-
-    function clearMovies() {
-      document.getElementById("movies").innerHTML = "";
-    }
-
-    function openIframe(videoUrl) {
-      const videoContainer = document.getElementById("videoContainer");
-      const videoFrame = document.getElementById("videoFrame");
-      videoFrame.src = videoUrl;
-      videoContainer.style.display = "block";
-    }
-
-    function closeIframe() {
-      const videoContainer = document.getElementById("videoContainer");
-      const videoFrame = document.getElementById("videoFrame");
-      videoFrame.src = "";
-      videoContainer.style.display = "none";
-    }
+    window.addEventListener("load",()=>{const e=document.querySelector(".intro-screen");e&&setTimeout(()=>{e.classList.add("fade-out"),setTimeout(()=>e.classList.add("hidden"),1e3)},1500)});function updatePlaceholder(){document.getElementById("search").placeholder=window.innerWidth<500?"Search":"Search for movies or TV shows..."}window.addEventListener("resize",updatePlaceholder),window.addEventListener("DOMContentLoaded",updatePlaceholder);let debounceTimeout;function debounceSearch(){clearTimeout(debounceTimeout),debounceTimeout=setTimeout(()=>{const e=document.getElementById("search").value.trim();e?searchMovies(e):clearMovies()},300)}function toggleSearch(){const e=document.querySelector(".search-container"),t=document.getElementById("search");e.classList.toggle("active"),e.classList.contains("active")?t.focus():t.blur()}function hideSearch(){setTimeout(()=>document.querySelector(".search-container").classList.remove("active"),200)}function switchMode(e){console.log("Switched to:",e)}function searchMovies(e){console.log("Searching for:",e)}function clearMovies(){document.getElementById("movies").innerHTML=""}function openIframe(e){const t=document.getElementById("videoContainer"),n=document.getElementById("videoFrame");n.src=e,t.style.display="block"}function closeIframe(){const e=document.getElementById("videoContainer"),t=document.getElementById("videoFrame");t.src="",e.style.display="none"}
   </script>
 
-  <script src="script.js"></script>
-  <script src="remote.js"></script>
-    <script src="modal.js"></script>
+  <!-- ✅ External scripts (non-blocking) -->
+  <script src="https://vid-us.vercel.app/script.js" defer></script>
+  <script src="https://vid-us.vercel.app/remote.js" defer></script>
+  <script src="https://vid-us.vercel.app/modal.js" defer></script>
 </body>
 </html>
