@@ -22,12 +22,10 @@
     /* ✅ Larger buttons for TV remotes */
     .controls button, .search-container button {
       font-size: 1.8rem;
-      padding: 12px 18px;
     }
 
     .search-input {
       font-size: 1.2rem;
-      padding: 10px;
     }
 
     /* ✅ Focus highlight for TV navigation */
@@ -57,9 +55,62 @@
       background: #000;
       z-index: 1000;
     }
+
     #videoContainer button {
       font-size: 2.5rem;
-      padding: 10px 16px;
+    }
+
+    /* ✅ Center all icons inside buttons */
+    .controls button,
+    .search-container button,
+    #videoContainer button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      line-height: 1;
+      padding: 12px;
+      border-radius: 50%;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* ✅ Search container layout */
+    .search-container {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    /* ✅ Search input hidden by default */
+    .search-input {
+      width: 0;
+      opacity: 0;
+      pointer-events: none;
+      margin-left: 8px;
+      font-size: 1.2rem;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #111;
+      color: #fff;
+      transition: width 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* ✅ Show input when active */
+    .search-container.active .search-input {
+      width: 200px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ✅ Glow when focused */
+    .search-input:focus {
+      border-color: #00adee;
+      box-shadow: 0 0 6px #00adee;
     }
   </style>
 </head>
@@ -92,7 +143,7 @@
 
   <!-- ✅ Player -->
   <div id="videoContainer">
-    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;color:#fff">×</button>
+    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;">×</button>
     <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none"></iframe>
   </div>
 
