@@ -14,10 +14,53 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="all"/>
 
   <style>
-    img.logo{width:120px;height:auto}
-    .intro-screen img{width:200px;height:auto}
-    .intro-screen.fade-out{opacity:0;transition:opacity 1s ease}
-    .intro-screen.hidden{display:none}
+    img.logo {width: 140px; height: auto;}
+    .intro-screen img {width: 220px; height: auto;}
+    .intro-screen.fade-out {opacity: 0; transition: opacity 1s ease;}
+    .intro-screen.hidden {display: none;}
+
+    /* ✅ Larger buttons for TV remotes */
+    .controls button, .search-container button {
+      font-size: 1.8rem;
+      padding: 12px 18px;
+    }
+
+    .search-input {
+      font-size: 1.2rem;
+      padding: 10px;
+    }
+
+    /* ✅ Focus highlight for TV navigation */
+    button:focus, input:focus, .movie-item:focus {
+      outline: 3px solid #00adee;
+      outline-offset: 4px;
+    }
+
+    /* ✅ Movie grid spacing */
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+      padding: 15px;
+    }
+
+    .movie-item {
+      cursor: pointer;
+    }
+
+    /* ✅ Video container fullscreen */
+    #videoContainer {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: 1000;
+    }
+    #videoContainer button {
+      font-size: 2.5rem;
+      padding: 10px 16px;
+    }
   </style>
 </head>
 <body>
@@ -42,21 +85,86 @@
 
   <!-- ✅ Content -->
   <main>
-    <div id="movies" class="movie-grid"></div>
+    <div id="movies" class="movie-grid" tabindex="0"></div>
     <div id="sentinel"></div>
     <div id="loading">Loading...</div>
     <div id="error"></div>
   </main>
 
   <!-- ✅ Player -->
-  <div id="videoContainer" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;background:#000">
-    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;font-size:2rem;color:#fff">×</button>
-    <iframe id="videoFrame" allowfullscreen style="width:100%;height:100%;border:none"></iframe>
+  <div id="videoContainer">
+    <button onclick="closeIframe()" style="position:absolute;top:10px;right:10px;z-index:1001;background:none;border:none;color:#fff">×</button>
+    <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none"></iframe>
   </div>
 
-  <!-- ✅ Minified Inline JS -->
+  <!-- ✅ Scripts -->
   <script>
-    window.addEventListener("load",()=>{const e=document.querySelector(".intro-screen");e&&setTimeout(()=>{e.classList.add("fade-out"),setTimeout(()=>e.classList.add("hidden"),1e3)},1500)});function updatePlaceholder(){document.getElementById("search").placeholder=window.innerWidth<500?"Search":"Search for movies or TV shows..."}window.addEventListener("resize",updatePlaceholder),window.addEventListener("DOMContentLoaded",updatePlaceholder);let debounceTimeout;function debounceSearch(){clearTimeout(debounceTimeout),debounceTimeout=setTimeout(()=>{const e=document.getElementById("search").value.trim();e?searchMovies(e):clearMovies()},300)}function toggleSearch(){const e=document.querySelector(".search-container"),t=document.getElementById("search");e.classList.toggle("active"),e.classList.contains("active")?t.focus():t.blur()}function hideSearch(){setTimeout(()=>document.querySelector(".search-container").classList.remove("active"),200)}function switchMode(e){console.log("Switched to:",e)}function searchMovies(e){console.log("Searching for:",e)}function clearMovies(){document.getElementById("movies").innerHTML=""}function openIframe(e){const t=document.getElementById("videoContainer"),n=document.getElementById("videoFrame");n.src=e,t.style.display="block"}function closeIframe(){const e=document.getElementById("videoContainer"),t=document.getElementById("videoFrame");t.src="",e.style.display="none"}
+    // ✅ Intro screen fade
+    window.addEventListener("load",()=>{
+      const intro=document.querySelector(".intro-screen");
+      if(intro){
+        setTimeout(()=>{
+          intro.classList.add("fade-out");
+          setTimeout(()=>intro.classList.add("hidden"),1000);
+        },1500);
+      }
+    });
+
+    // ✅ Search placeholder adaptive
+    function updatePlaceholder(){
+      document.getElementById("search").placeholder =
+        window.innerWidth < 500 ? "Search" : "Search for movies or TV shows...";
+    }
+    window.addEventListener("resize",updatePlaceholder);
+    window.addEventListener("DOMContentLoaded",updatePlaceholder);
+
+    // ✅ Debounced search
+    let debounceTimeout;
+    function debounceSearch(){
+      clearTimeout(debounceTimeout);
+      debounceTimeout=setTimeout(()=>{
+        const val=document.getElementById("search").value.trim();
+        val?searchMovies(val):clearMovies();
+      },300);
+    }
+
+    // ✅ Search toggle
+    function toggleSearch(){
+      const c=document.querySelector(".search-container"), s=document.getElementById("search");
+      c.classList.toggle("active");
+      c.classList.contains("active")?s.focus():s.blur();
+    }
+    function hideSearch(){setTimeout(()=>document.querySelector(".search-container").classList.remove("active"),200)}
+
+    // ✅ Dummy functions (replace with TMDB/Movie API later)
+    function switchMode(m){console.log("Switched to:",m)}
+    function searchMovies(q){console.log("Searching:",q)}
+    function clearMovies(){document.getElementById("movies").innerHTML=""}
+
+    // ✅ Video player
+    function openIframe(url){
+      const vc=document.getElementById("videoContainer"), vf=document.getElementById("videoFrame");
+      vf.src=url; vc.style.display="block";
+    }
+    function closeIframe(){
+      const vc=document.getElementById("videoContainer"), vf=document.getElementById("videoFrame");
+      vf.src=""; vc.style.display="none";
+    }
+
+    // ✅ Remote navigation for TV
+    document.addEventListener("keydown",(e)=>{
+      const focusable=document.querySelectorAll("button, .movie-item, input");
+      let index=[...focusable].indexOf(document.activeElement);
+
+      switch(e.key){
+        case "ArrowRight": if(index+1<focusable.length) focusable[index+1].focus(); break;
+        case "ArrowLeft": if(index-1>=0) focusable[index-1].focus(); break;
+        case "ArrowDown": if(index+3<focusable.length) focusable[index+3].focus(); break;
+        case "ArrowUp": if(index-3>=0) focusable[index-3].focus(); break;
+        case "Enter": document.activeElement.click?.(); break;
+        case "Backspace": closeIframe(); break; // TV back button closes player
+      }
+    });
   </script>
 
   <!-- ✅ External scripts (non-blocking) -->
