@@ -15,14 +15,45 @@
 
   <style>
     img.logo {width: 140px; height: auto;}
-    .intro-screen img {width: 220px; height: auto;}
-    .intro-screen.fade-out {opacity: 0; transition: opacity 1s ease;}
-    .intro-screen.hidden {display: none;}
 
-    /* ✅ Larger buttons for TV remotes */
-    .controls button, .search-container button {
-      font-size: 1.8rem;
-      padding: 12px 18px;
+    /* ✅ Controls container */
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    /* ✅ Button + Label container */
+    .category-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .category-btn button {
+      font-size: 1.6rem;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      color: #fff;
+    }
+
+    .category-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #fff;
+      opacity: 0.8;
+      text-align: center;
+    }
+
+    /* ✅ Search container styling */
+    .search-container {
+      display: flex;
+      align-items: center;
     }
 
     .search-input {
@@ -36,16 +67,23 @@
       outline-offset: 4px;
     }
 
-    /* ✅ Movie grid spacing */
+    /* ✅ Category title styling */
+    #category-title {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-top: 15px;
+      margin-bottom: 10px;
+      color: #fff;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    /* ✅ Movie grid */
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 15px;
       padding: 15px;
-    }
-
-    .movie-item {
-      cursor: pointer;
     }
 
     /* ✅ Video container fullscreen */
@@ -64,24 +102,38 @@
   </style>
 </head>
 <body>
-  <!-- ✅ Intro -->
-  <div id="intro-screen" class="intro-screen">
-    <img src="https://variety.com/wp-content/uploads/2019/02/netflix_newlogoanimation.gif" alt="Intro Animation" loading="lazy"/>
-  </div>
 
   <!-- ✅ Header -->
   <header class="bottom-menu">
     <img src="https://i.ibb.co/jPG09vpp/93685c048f65a023413392ef61745925.png" alt="Logo" class="logo" loading="lazy"/>
     <div class="controls">
-      <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i></button>
-      <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i></button>
-      <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-dragon"></i></button>
+      
+      <!-- ✅ Category buttons with labels -->
+      <div class="category-btn">
+        <button onclick="switchMode('movie')" title="Movies"><i class="fas fa-film"></i></button>
+        <span class="category-label">Movies</span>
+      </div>
+
+      <div class="category-btn">
+        <button onclick="switchMode('tv')" title="TV Series"><i class="fas fa-tv"></i></button>
+        <span class="category-label">TV Series</span>
+      </div>
+
+      <div class="category-btn">
+        <button onclick="switchMode('anime')" title="Anime"><i class="fas fa-dragon"></i></button>
+        <span class="category-label">Anime</span>
+      </div>
+
+      <!-- ✅ Search -->
       <div class="search-container">
         <button class="search-toggle" onclick="toggleSearch()" title="Search"><i class="fas fa-search"></i></button>
         <input id="search" type="text" class="search-input" placeholder="Search..." oninput="debounceSearch()" onblur="hideSearch()"/>
       </div>
     </div>
   </header>
+
+  <!-- ✅ Category Title -->
+  <h2 id="category-title">Movies</h2>
 
   <!-- ✅ Content -->
   <main>
@@ -99,16 +151,75 @@
 
   <!-- ✅ Scripts -->
   <script>
-    // ✅ Intro screen fade
-    window.addEventListener("load",()=>{
-      const intro=document.querySelector(".intro-screen");
-      if(intro){
-        setTimeout(()=>{
-          intro.classList.add("fade-out");
-          setTimeout(()=>intro.classList.add("hidden"),1000);
-        },1500);
+    function updatePlaceholder(){
+      document.getElementById("search").placeholder =
+        window.innerWidth < 500 ? "Search" : "Search for movies or TV shows...";
+    }
+    window.addEventListener("resize",updatePlaceholder);
+    window.addEventListener("DOMContentLoaded",updatePlaceholder);
+
+    let debounceTimeout;
+    function debounceSearch(){
+      clearTimeout(debounceTimeout);
+      debounceTimeout=setTimeout(()=>{
+        const val=document.getElementById("search").value.trim();
+        val?searchMovies(val):clearMovies();
+      },300);
+    }
+
+    function toggleSearch(){
+      const c=document.querySelector(".search-container"), s=document.getElementById("search");
+      c.classList.toggle("active");
+      c.classList.contains("active")?s.focus():s.blur();
+    }
+    function hideSearch(){setTimeout(()=>document.querySelector(".search-container").classList.remove("active"),200)}
+
+    // ✅ Category switching with smooth title update
+    function switchMode(mode){
+      const title=document.getElementById("category-title");
+      title.style.opacity="0";
+      setTimeout(()=>{
+        if(mode==="movie"){title.textContent="Movies";}
+        if(mode==="tv"){title.textContent="TV Series";}
+        if(mode==="anime"){title.textContent="Anime";}
+        title.style.opacity="1";
+      },200);
+      console.log("Switched to:",mode);
+    }
+
+    function searchMovies(q){console.log("Searching:",q)}
+    function clearMovies(){document.getElementById("movies").innerHTML=""}
+
+    function openIframe(url){
+      const vc=document.getElementById("videoContainer"), vf=document.getElementById("videoFrame");
+      vf.src=url; vc.style.display="block";
+    }
+    function closeIframe(){
+      const vc=document.getElementById("videoContainer"), vf=document.getElementById("videoFrame");
+      vf.src=""; vc.style.display="none";
+    }
+
+    document.addEventListener("keydown",(e)=>{
+      const focusable=document.querySelectorAll("button, .movie-item, input");
+      let index=[...focusable].indexOf(document.activeElement);
+
+      switch(e.key){
+        case "ArrowRight": if(index+1<focusable.length) focusable[index+1].focus(); break;
+        case "ArrowLeft": if(index-1>=0) focusable[index-1].focus(); break;
+        case "ArrowDown": if(index+3<focusable.length) focusable[index+3].focus(); break;
+        case "ArrowUp": if(index-3>=0) focusable[index-3].focus(); break;
+        case "Enter": document.activeElement.click?.(); break;
+        case "Backspace": closeIframe(); break;
       }
     });
+  </script>
+
+  <!-- ✅ External scripts -->
+  <script src="https://vid-us.vercel.app/script.js" defer></script>
+  <script src="https://vid-us.vercel.app/remote.js" defer></script>
+  <script src="https://vid-us.vercel.app/modal.js" defer></script>
+</body>
+</html>    });
 
     // ✅ Search placeholder adaptive
     function updatePlaceholder(){
